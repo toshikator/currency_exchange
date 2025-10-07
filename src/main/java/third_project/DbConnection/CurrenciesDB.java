@@ -126,6 +126,7 @@ public class CurrenciesDB {
                     ResultSet resultSet = preparedStatement.executeQuery(sql);
                     if (resultSet.next()) {
 
+
                         int id = resultSet.getInt(idColumnNumber);
                         String fullName = resultSet.getString(fullNameColumnNumber);
                         String sign = resultSet.getString(signColumnNumber);

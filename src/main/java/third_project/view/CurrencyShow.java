@@ -25,21 +25,17 @@ public class CurrencyShow extends HttpServlet {
                 return;
             }
             Currency currency = CurrenciesDB.selectOne(pathInfo.substring(1));
-//            Currency currency = CurrenciesDB.selectOne(id);
-
-
+            if (currency == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
             PrintWriter out = response.getWriter();
             out.println(currency);
             response.setStatus(HttpServletResponse.SC_OK);
-//            response.getWriter().println("Hello WorldD!");
-//            response.getWriter().println(pathInfo);
-//            response.getWriter().println("\n\n");
-//            response.getWriter().println(pathInfo.substring(1));
 
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-
     }
 }

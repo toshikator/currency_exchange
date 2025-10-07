@@ -1,0 +1,6 @@
+com\example\currency_exchange\HelloServlet.class
+third_project\Currency.class
+third_project\DbConnection\CurrenciesDB.class
+third_project\view\CurrenciesList.class
+third_project\view\Currency.class
+third_project\view\ShowDbServlet.class
