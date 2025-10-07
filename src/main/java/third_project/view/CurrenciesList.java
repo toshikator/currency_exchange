@@ -7,11 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import third_project.CurrenciesDB;
+import third_project.DbConnection.CurrenciesDB;
 import third_project.Currency;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
@@ -31,15 +30,10 @@ public class CurrenciesList extends HttpServlet {
                 return;
             }
 
-
             mapper.writeValue(response.getWriter(), currencies);
-
-
             response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
-
         } catch (Exception e) {
             response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-
 }

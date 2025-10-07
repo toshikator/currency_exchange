@@ -1,4 +1,6 @@
-package third_project;
+package third_project.DbConnection;
+
+import third_project.Currency;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,30 +37,31 @@ public class CurrenciesDB {
             tableName = props.getProperty("tableNameCurrencies", "employees");
             // Load column numbers (1-based) from config with sensible defaults
             try {
-                idColumnNumber = Integer.parseInt(props.getProperty("columns.id" ));
-            } catch (NumberFormatException ignore) { idColumnNumber = 1; }
+                idColumnNumber = Integer.parseInt(props.getProperty("columns.id"));
+            } catch (NumberFormatException ignore) {
+                idColumnNumber = 1;
+            }
             try {
                 codeColumnNumber = Integer.parseInt(props.getProperty("columns.code"));
-            } catch (NumberFormatException ignore) { codeColumnNumber = 2; }
+            } catch (NumberFormatException ignore) {
+                codeColumnNumber = 2;
+            }
             try {
                 fullNameColumnNumber = Integer.parseInt(props.getProperty("columns.fullName"));
-            } catch (NumberFormatException ignore) { fullNameColumnNumber = 3; }
+            } catch (NumberFormatException ignore) {
+                fullNameColumnNumber = 4;
+            }
             try {
                 signColumnNumber = Integer.parseInt(props.getProperty("columns.sign"));
-            } catch (NumberFormatException ignore) { signColumnNumber = 4; }
+            } catch (NumberFormatException ignore) {
+                signColumnNumber = 3;
+            }
 
             // Construct Oracle JDBC URL by default using address and databaseName from config
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
         } catch (Exception e) {
-            // Fallback to previous hardcoded values if anything goes wrong
-            url = "jdbc:oracle:thin:@//10.100.102.14:1521/XEPDB1";
-            username = "hr";
-            password = "hr";
-            tableName = "employees";
-            idColumnNumber = 1;
-            codeColumnNumber = 2;
-            fullNameColumnNumber = 3;
-            signColumnNumber = 4;
+            System.out.println("Failed to load database configuration");
+            System.err.println(e);
         }
     }
 
@@ -89,26 +92,50 @@ public class CurrenciesDB {
     }
 
     public static Currency selectOne(int id) {
-
         Currency currency = null;
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
-
                 String sql = "SELECT * FROM " + tableName + " WHERE id=" + id;
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setInt(idColumnNumber, id);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-
-
                         String code = resultSet.getString(codeColumnNumber);
                         String fullName = resultSet.getString(fullNameColumnNumber);
                         String sign = resultSet.getString(signColumnNumber);
+                        currency = new Currency(id, code, fullName, sign);
+
                     }
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Exception in selectOne by Currency id");
+            System.out.println("Currency id = " + id);
+            System.out.println(ex);
+        }
+        return currency;
+    }
+
+    public static Currency selectOne(String code) {
+        Currency currency = null;
+        try {
+            Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
+            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+                String sql = "SELECT * FROM " + tableName + " WHERE CODE='" + code.toUpperCase() + "'";
+                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    ResultSet resultSet = preparedStatement.executeQuery(sql);
+                    if (resultSet.next()) {
+
+                        int id = resultSet.getInt(idColumnNumber);
+                        String fullName = resultSet.getString(fullNameColumnNumber);
+                        String sign = resultSet.getString(signColumnNumber);
+                        currency = new Currency(id, code.toUpperCase(), fullName, sign);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Exception in selectOne by Currency Code");
+            System.out.println("Currency code = " + code);
             System.out.println(ex);
         }
         return currency;

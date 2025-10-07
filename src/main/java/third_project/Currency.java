@@ -12,6 +12,20 @@ public class Currency implements Serializable {
     public Currency() {
     }
 
+    public Currency(Currency other) {
+        this.id = other.id;
+        this.code = other.code;
+        this.fullName = other.fullName;
+        this.sign = other.sign;
+    }
+
+    public Currency(int id, String code, String fullName, String sign) {
+        this.id = id;
+        this.code = code;
+        this.fullName = fullName;
+        this.sign = sign;
+    }
+
     @Override
     public String toString() {
         return "Currency{" +
@@ -20,14 +34,6 @@ public class Currency implements Serializable {
                 ", fullName='" + fullName + '\'' +
                 ", sign='" + sign + '\'' +
                 '}';
-    }
-
-
-    public Currency(int id, String code, String fullName, String sign) {
-        this.id = id;
-        this.code = code;
-        this.fullName = fullName;
-        this.sign = sign;
     }
 
     public int getId() {
