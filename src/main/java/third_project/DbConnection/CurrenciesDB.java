@@ -116,7 +116,7 @@ public class CurrenciesDB {
         return currency;
     }
 
-    public static Currency selectOne(String code) {
+    public static Currency selectOne(String code) throws SQLException {
         Currency currency = null;
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
@@ -138,6 +138,7 @@ public class CurrenciesDB {
             System.out.println("Exception in selectOne by Currency Code");
             System.out.println("Currency code = " + code);
             System.out.println(ex);
+            throw new SQLException("Currency not found in the database");
         }
         return currency;
     }
@@ -153,9 +154,6 @@ public class CurrenciesDB {
                     preparedStatement.setString(fullNameColumnNumber, currency.getFullName());
                     preparedStatement.setString(codeColumnNumber, currency.getCode());
                     preparedStatement.setString(signColumnNumber, currency.getSign());
-
-//                    preparedStatement.setInt(salaryColumnNumber, currency.getSalary());
-
                     return preparedStatement.executeUpdate();
                 }
             }
@@ -176,7 +174,6 @@ public class CurrenciesDB {
                     preparedStatement.setString(fullNameColumnNumber, currency.getFullName());
                     preparedStatement.setString(codeColumnNumber, currency.getCode());
                     preparedStatement.setString(signColumnNumber, currency.getSign());
-//                    preparedStatement.setInt(salaryColumnNumber, currency.getSalary());
                     preparedStatement.setInt(idColumnNumber, currency.getId());
 
                     return preparedStatement.executeUpdate();
