@@ -29,33 +29,18 @@ public class CurrenciesDB {
                     props.load(in);
                 }
             }
-            String address = props.getProperty("address", "10.100.102.14");
-            String port = props.getProperty("port", "1521");
-            String databaseName = props.getProperty("databaseName", "XEPDB1");
-            username = props.getProperty("username", "hr");
-            password = props.getProperty("password", "hr");
-            tableName = props.getProperty("tableNameCurrencies", "employees");
-            // Load column numbers (1-based) from config with sensible defaults
-            try {
-                idColumnNumber = Integer.parseInt(props.getProperty("columns.id"));
-            } catch (NumberFormatException ignore) {
-                idColumnNumber = 1;
-            }
-            try {
-                codeColumnNumber = Integer.parseInt(props.getProperty("columns.code"));
-            } catch (NumberFormatException ignore) {
-                codeColumnNumber = 2;
-            }
-            try {
-                fullNameColumnNumber = Integer.parseInt(props.getProperty("columns.fullName"));
-            } catch (NumberFormatException ignore) {
-                fullNameColumnNumber = 4;
-            }
-            try {
-                signColumnNumber = Integer.parseInt(props.getProperty("columns.sign"));
-            } catch (NumberFormatException ignore) {
-                signColumnNumber = 3;
-            }
+            String address = props.getProperty("address");
+            String port = props.getProperty("port");
+            String databaseName = props.getProperty("databaseName");
+            username = props.getProperty("username");
+            password = props.getProperty("password");
+            tableName = props.getProperty("tableNameCurrencies");
+
+            idColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.id"));
+            codeColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.code"));
+            fullNameColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.fullName"));
+            signColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.sign"));
+
 
             // Construct Oracle JDBC URL by default using address and databaseName from config
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
@@ -143,24 +128,26 @@ public class CurrenciesDB {
         return currency;
     }
 
-    public static int insert(Currency currency) {
+    public static Currency insert(Currency currency) {
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
 
-                String sql = "INSERT INTO " + tableName + " (name, price) Values (?, ?)";
+                String sql = "INSERT INTO " + tableName + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(fullNameColumnNumber, currency.getFullName());
-                    preparedStatement.setString(codeColumnNumber, currency.getCode());
-                    preparedStatement.setString(signColumnNumber, currency.getSign());
-                    return preparedStatement.executeUpdate();
+                    preparedStatement.setString(1, currency.getCode().toUpperCase());
+                    preparedStatement.setString(2, currency.getSign());
+                    preparedStatement.setString(3, currency.getFullName());
+                    preparedStatement.executeUpdate();
+                    return selectOne(currency.getCode());
                 }
             }
         } catch (Exception ex) {
+            System.out.println("insert exception: " + ex);
             System.out.println(ex);
         }
-        return 0;
+        return null;
     }
 
     public static int update(Currency currency) {
@@ -180,6 +167,7 @@ public class CurrenciesDB {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("update exception: " + ex);
             System.out.println(ex);
         }
         return 0;
@@ -199,6 +187,7 @@ public class CurrenciesDB {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("delete exception: " + ex);
             System.out.println(ex);
         }
         return 0;

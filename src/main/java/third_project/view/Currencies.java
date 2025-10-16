@@ -35,7 +35,8 @@ public class Currencies extends HttpServlet {
             currency.setFullName(name);
             currency.setCode(code);
             currency.setSign(sign);
-            int id = CurrenciesDB.insert(currency);
+            CurrenciesDB.insert(currency);
+            int id = CurrenciesDB.selectOne(code).getId();
             currency.setId(id);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), currency);

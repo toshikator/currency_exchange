@@ -1,5 +1,6 @@
 package third_project.view;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,25 +22,28 @@ public class ExchangeRates extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
-            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
+            ObjectMapper mapper = new ObjectMapper();
+//            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
+//            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
 
-            if (baseCurrencyCode == null || targetCurrencyCode == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Currency codes are required");
-                return;
-            }
+//            if (baseCurrencyCode == null || targetCurrencyCode == null) {
+//                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Currency codes are required");
+//                return;
+//            }
 
             try {
-                if (baseCurrencyCode.equals(targetCurrencyCode)) throw new IllegalArgumentException();
-                Currency baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
-                Currency targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
+//                if (baseCurrencyCode.equals(targetCurrencyCode)) throw new IllegalArgumentException();
+//                Currency baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
+//                Currency targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
 
                 response.setContentType("text/html;charset=UTF-8");
                 PrintWriter out = response.getWriter();
-                out.println("<h2>Exchange Rate Information</h2>");
-                out.println("<p>Base Currency: " + baseCurrency.getCode() + " - " + baseCurrency.getFullName() + "</p>");
-                out.println("<p>Target Currency: " + targetCurrency.getCode() + " - " + targetCurrency.getFullName() + "</p>");
+//                out.println("<h2>Exchange Rate Information</h2>");
+//                out.println("<p>Base Currency: " + baseCurrency.getCode() + " - " + baseCurrency.getFullName() + "</p>");
+//                out.println("<p>Target Currency: " + targetCurrency.getCode() + " - " + targetCurrency.getFullName() + "</p>");
                 response.setStatus(HttpServletResponse.SC_OK);
             } catch (IllegalArgumentException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Base currency code must be different from target currency code");

@@ -6,7 +6,7 @@
     <style>
         .form-window {
             width: 500px;
-            margin: 6px auto; /* centers horizontally */
+            margin: 20px auto; /* centers horizontally */
             padding: 6px;
             border: 8px solid #ccc;
             border-radius: 20px;
@@ -14,7 +14,7 @@
             background-color: #f9f9f9;
         }
 
-        h2 {
+        h3 {
             text-align: center;
         }
 
@@ -45,10 +45,12 @@
 <a href="hello-servlet">Hello Servlet</a>
 
 <br/>
-<a href="show-db">Show DataBase</a>
+<a href="show-db">Show Currencies table in a readable view</a>
 
 <br/>
-<a href="currencies">currencies JSON</a>
+<a href="currencies">All currencies JSON</a>
+<br/>
+<a href="exchangeRates">All exchange rates JSON</a>
 
 <h3>Post exchange rate</h3>
 <form class="form-window" action="exchangeRates" method="post" enctype="application/x-www-form-urlencoded">
