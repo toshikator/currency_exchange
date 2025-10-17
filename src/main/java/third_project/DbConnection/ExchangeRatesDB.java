@@ -1,19 +1,16 @@
 package third_project.DbConnection;
 
+import third_project.Currency;
+import third_project.ExchangeRate;
+import third_project.view.ExchangeRates;
+
+import java.math.BigDecimal;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-/**
- * Connector/DAO for the exchangerates table using the same database as CurrenciesDB.
- * <p>
- * Expected table structure (Oracle):
- * - BASE_CURRENCY_CODE (VARCHAR2) — code like "USD"
- * - TARGET_CURRENCY_CODE (VARCHAR2) — code like "EUR"
- * - RATE (NUMBER) — rate to convert 1 base to target
- * - (optional) other columns are ignored by SQL below
- * <p>
- * Table name is read from configs/db.properties key: tableNameExchangeRates
- */
+
 public class ExchangeRatesDB {
 
     static String url;
@@ -21,8 +18,12 @@ public class ExchangeRatesDB {
     static String password;
     static String tableName;
 
+    static int idColumnNumber;
+    static int baseCurrencyIdColumnNumber;
+    static int targetCurrencyIdColumnNumber;
+    static int rateColumnNumber;
+
     static {
-        // Load database configuration from configs/db.properties on the classpath
         try {
             Properties props = new Properties();
             try (java.io.InputStream in = ExchangeRatesDB.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
@@ -36,6 +37,11 @@ public class ExchangeRatesDB {
             username = props.getProperty("username");
             password = props.getProperty("password");
             tableName = props.getProperty("tableNameExchangeRates");
+
+            idColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.id"));
+            baseCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.baseCurrencyId"));
+            targetCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.targetCurrencyId"));
+            rateColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.rate"));
 
             // Construct Oracle JDBC URL by default using address and databaseName from config
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
@@ -131,5 +137,30 @@ public class ExchangeRatesDB {
             System.err.println(ex);
         }
         return 0;
+    }
+
+    public static List<ExchangeRate> selectAll() {
+
+        ArrayList<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
+        try {
+            Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
+            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
+                while (resultSet.next()) {
+                    BigDecimal rate = new BigDecimal("1234.567989");
+                    int id = resultSet.getInt(idColumnNumber);
+                    int baseCurrency = resultSet.getInt(baseCurrencyIdColumnNumber);
+                    int targetCurrency = resultSet.getInt(targetCurrencyIdColumnNumber);
+                    rate = resultSet.getBigDecimal(rateColumnNumber);
+                    ExchangeRate exchangeRate = new ExchangeRate(id, baseCurrency, targetCurrency, rate);
+                    exchangeRates.add(exchangeRate);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return exchangeRates;
     }
 }

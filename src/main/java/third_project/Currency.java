@@ -12,12 +12,6 @@ public class Currency implements Serializable {
     public Currency() {
     }
 
-    public Currency(Currency other) {
-        this.id = other.id;
-        this.code = other.code;
-        this.fullName = other.fullName;
-        this.sign = other.sign;
-    }
 
     public Currency(int id, String code, String fullName, String sign) {
         this.id = id;

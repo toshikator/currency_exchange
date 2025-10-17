@@ -7,9 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.Currency;
 import third_project.DbConnection.CurrenciesDB;
+import third_project.DbConnection.ExchangeRatesDB;
+import third_project.ExchangeRate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
 public class ExchangeRates extends HttpServlet {
@@ -26,32 +29,18 @@ public class ExchangeRates extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ObjectMapper mapper = new ObjectMapper();
-//            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-//            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-
-//            if (baseCurrencyCode == null || targetCurrencyCode == null) {
-//                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Currency codes are required");
-//                return;
-//            }
-
-            try {
-//                if (baseCurrencyCode.equals(targetCurrencyCode)) throw new IllegalArgumentException();
-//                Currency baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
-//                Currency targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
-
-                response.setContentType("text/html;charset=UTF-8");
-                PrintWriter out = response.getWriter();
-//                out.println("<h2>Exchange Rate Information</h2>");
-//                out.println("<p>Base Currency: " + baseCurrency.getCode() + " - " + baseCurrency.getFullName() + "</p>");
-//                out.println("<p>Target Currency: " + targetCurrency.getCode() + " - " + targetCurrency.getFullName() + "</p>");
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (IllegalArgumentException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Base currency code must be different from target currency code");
-            } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid currency code or unfound currency code");
+            List<ExchangeRate> exchangeRates = ExchangeRatesDB.selectAll();
+            if (exchangeRates == null || exchangeRates.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
+
+            mapper.writeValue(response.getWriter(), exchangeRates);
+            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error occurred");
+            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+
         }
     }
 
