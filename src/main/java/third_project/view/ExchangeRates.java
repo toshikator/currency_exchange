@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.Currency;
+import third_project.DTOExchangeRate;
 import third_project.DbConnection.CurrenciesDB;
 import third_project.DbConnection.ExchangeRatesDB;
 import third_project.ExchangeRate;
@@ -13,6 +14,7 @@ import third_project.ExchangeRate;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
 public class ExchangeRates extends HttpServlet {
@@ -29,7 +31,8 @@ public class ExchangeRates extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<ExchangeRate> exchangeRates = ExchangeRatesDB.selectAll();
+//            List<ExchangeRate> exchangeRates = ExchangeRatesDB.selectAll();
+            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().stream().map(DTOExchangeRate::new).collect(Collectors.toList());
             if (exchangeRates == null || exchangeRates.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
