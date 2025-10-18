@@ -81,8 +81,9 @@ public class CurrenciesDB {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
-                String sql = "SELECT * FROM " + tableName + " WHERE id=" + id;
+                String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                    preparedStatement.setInt(1, id);
                     ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
                         String code = resultSet.getString(codeColumnNumber);
@@ -106,12 +107,11 @@ public class CurrenciesDB {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
-                String sql = "SELECT * FROM " + tableName + " WHERE CODE='" + code.toUpperCase() + "'";
+                String sql = "SELECT * FROM " + tableName + " WHERE CODE = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    ResultSet resultSet = preparedStatement.executeQuery(sql);
+                    preparedStatement.setString(1, code.toUpperCase());
+                    ResultSet resultSet = preparedStatement.executeQuery();
                     if (resultSet.next()) {
-
-
                         int id = resultSet.getInt(idColumnNumber);
                         String fullName = resultSet.getString(fullNameColumnNumber);
                         String sign = resultSet.getString(signColumnNumber);
@@ -156,12 +156,12 @@ public class CurrenciesDB {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
 
-                String sql = "UPDATE " + tableName + " SET name = ?, price = ? WHERE id = ?";
+                String sql = "UPDATE " + tableName + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(fullNameColumnNumber, currency.getFullName());
-                    preparedStatement.setString(codeColumnNumber, currency.getCode());
-                    preparedStatement.setString(signColumnNumber, currency.getSign());
-                    preparedStatement.setInt(idColumnNumber, currency.getId());
+                    preparedStatement.setString(1, currency.getCode().toUpperCase());
+                    preparedStatement.setString(2, currency.getSign());
+                    preparedStatement.setString(3, currency.getFullName());
+                    preparedStatement.setInt(4, currency.getId());
 
                     return preparedStatement.executeUpdate();
                 }
@@ -181,7 +181,7 @@ public class CurrenciesDB {
 
                 String sql = "DELETE FROM " + tableName + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setInt(idColumnNumber, id);
+                    preparedStatement.setInt(1, id);
 
                     return preparedStatement.executeUpdate();
                 }

@@ -49,7 +49,7 @@ public class ExchangeRates extends HttpServlet {
             throws IOException {
         try {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-            String targetCurrencyCode = request.getParameter("targetCurrencyCode ");
+            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             try {
                 if (baseCurrencyCode.equals(targetCurrencyCode)) throw new IllegalArgumentException();
                 Currency baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
