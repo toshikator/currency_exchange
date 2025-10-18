@@ -32,7 +32,7 @@ public class ExchangeRates extends HttpServlet {
         try {
             ObjectMapper mapper = new ObjectMapper();
 //            List<ExchangeRate> exchangeRates = ExchangeRatesDB.selectAll();
-            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().stream().map(DTOExchangeRate::new).collect(Collectors.toList());
+            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map(DTOExchangeRate::new).collect(Collectors.toList());
             if (exchangeRates == null || exchangeRates.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
