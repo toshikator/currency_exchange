@@ -44,7 +44,7 @@ public class DTOExchangeRate implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return "DTOExchangeRate{" +
+        return "{" +
                 "id=" + id +
                 ", baseCurrency=" + baseCurrency +
                 ", targetCurrency=" + targetCurrency +

@@ -1,0 +1,54 @@
+package third_project.view;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import third_project.DTOExchangeRate;
+import third_project.DbConnection.CurrenciesDB;
+import third_project.DbConnection.ExchangeRatesDB;
+import third_project.ExchangeRate;
+
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+
+@WebServlet(name = "exchangerate", value = "/exchangerate/*")
+public class ExchangeRateShow extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            String pathInfo = request.getPathInfo();
+            if (pathInfo == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            String path = pathInfo.substring(1);
+            String baseCurrencyCode = path.substring(0, 3).toUpperCase();
+            String targetCurrencyCode = path.substring(3, 6).toUpperCase();
+            if (baseCurrencyCode == null || targetCurrencyCode == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            PrintWriter out = response.getWriter();
+            int baseCurrencyId = CurrenciesDB.selectOne(baseCurrencyCode).getId();
+            int targetCurrencyId = CurrenciesDB.selectOne(targetCurrencyCode).getId();
+            ExchangeRate rate = ExchangeRatesDB.selectRate(baseCurrencyId, targetCurrencyId);
+            out.println(new DTOExchangeRate(rate));
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (NullPointerException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            System.out.println("loloL " + e);
+            throw new ServletException("Error processing exchange rate request", e);
+        }
+    }
+}

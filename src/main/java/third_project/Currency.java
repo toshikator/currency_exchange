@@ -22,7 +22,7 @@ public class Currency implements Serializable {
 
     @Override
     public String toString() {
-        return "Currency{" +
+        return "{" +
                 "id=" + id +
                 ", code='" + code + '\'' +
                 ", fullName='" + fullName + '\'' +

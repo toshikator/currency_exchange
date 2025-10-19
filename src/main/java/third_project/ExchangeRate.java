@@ -14,10 +14,10 @@ public class ExchangeRate implements Serializable {
     }
 
 
-    public ExchangeRate(int id, int baseCurrencyCode, int targetCurrencyCode, BigDecimal rate) {
+    public ExchangeRate(int id, int baseCurrencyId, int targetCurrencyId, BigDecimal rate) {
         this.id = id;
-        this.baseCurrencyCode = baseCurrencyCode;
-        this.targetCurrencyCode = targetCurrencyCode;
+        this.baseCurrencyCode = baseCurrencyId;
+        this.targetCurrencyCode = targetCurrencyId;
         this.rate = rate;
 
     }
@@ -52,7 +52,7 @@ public class ExchangeRate implements Serializable {
 
     @Override
     public String toString() {
-        return "ExchangeRate{" +
+        return "{" +
                 "id=" + id +
                 "baseCurrencyCode='" + baseCurrencyCode + '\'' +
                 ", targetCurrencyCode='" + targetCurrencyCode + '\'' +
