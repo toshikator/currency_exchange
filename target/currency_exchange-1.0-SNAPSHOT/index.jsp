@@ -52,11 +52,12 @@
 <br/>
 <a href="exchangeRates">All exchange rates JSON</a>
 
+
 <h3>Post exchange rate</h3>
 <form class="form-window" action="exchangeRates" method="post" enctype="application/x-www-form-urlencoded">
     baseCurrencyCode: <input type="text" name="baseCurrencyCode"/><br><br>
     targetCurrencyCode: <input type="text" name="targetCurrencyCode"/><br><br>
-    rate: <input type="number" name="rate"/><br><br>
+    rate: <input type="text" name="rate"/><br><br>
     <input type="submit" value="Submit">
 </form>
 

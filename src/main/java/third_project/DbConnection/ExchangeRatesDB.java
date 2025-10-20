@@ -1,6 +1,7 @@
 package third_project.DbConnection;
 
 import third_project.Currency;
+import third_project.DTOExchangeRate;
 import third_project.ExchangeRate;
 import third_project.view.ExchangeRates;
 
@@ -86,7 +87,6 @@ public class ExchangeRatesDB {
         return null;
     }
 
-
     public static List<ExchangeRate> selectAll() {
 
         ArrayList<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
@@ -110,5 +110,43 @@ public class ExchangeRatesDB {
             System.out.println(ex);
         }
         return exchangeRates;
+    }
+
+    public static ExchangeRate insert(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        Currency baseCurrency = null;
+        Currency targetCurrency = null;
+        try {
+            baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
+            if (baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency code provided");
+            targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
+            if (targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency code provided");
+
+        } catch (Exception e) {
+            System.out.println("Currency seeking exception on insert: " + e);
+            System.err.println(e);
+        }
+        ExchangeRate exchangeRate = ExchangeRatesDB.insert(baseCurrency.getId(), targetCurrency.getId(), rate);
+        return exchangeRate;
+    }
+
+    public static ExchangeRate insert(int baseCurrencyCode, int targetCurrencyCode, BigDecimal rate) {
+        ExchangeRate exchangeRate = null;
+        try {
+            Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
+            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+                String sql = "INSERT INTO " + tableName + " (BASECURRENCYID, TARGETCURRENCYID, RATE) VALUES (?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, baseCurrencyCode);
+                    ps.setInt(2, targetCurrencyCode);
+                    ps.setBigDecimal(3, rate);
+                    ps.executeUpdate();
+                }
+            }
+            exchangeRate = ExchangeRatesDB.selectRate(CurrenciesDB.selectOne(baseCurrencyCode).getId(), CurrenciesDB.selectOne(targetCurrencyCode).getId());
+        } catch (Exception e) {
+            System.out.println("insert exception: " + e);
+            System.err.println(e);
+        }
+        return exchangeRate;
     }
 }
