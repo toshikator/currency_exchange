@@ -39,10 +39,8 @@
     </style>
 </head>
 <body>
-<h1><%= "Hello World!" %>
+<h1><%= "test for currencyConverter!" %>
 </h1>
-<br/>
-<a href="hello-servlet">Hello Servlet</a>
 
 <br/>
 <a href="show-db">Show Currencies table in a readable view</a>
@@ -63,6 +61,14 @@
 
 <h3>Post currency</h3>
 <form class="form-window" action="currencies" method="post" enctype="application/x-www-form-urlencoded">
+    name: <input type="text" name="name"/><br><br>
+    code: <input type="text" name="code"/><br><br>
+    sign: <input type="text" name="sign"/><br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h3>Patch exchange rate</h3>
+<form class="form-window" action="exchangerate/usdeur" method=enctype="application/x-www-form-urlencoded">
     name: <input type="text" name="name"/><br><br>
     code: <input type="text" name="code"/><br><br>
     sign: <input type="text" name="sign"/><br><br>

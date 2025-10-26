@@ -5,9 +5,12 @@ import third_project.Currency;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class CurrenciesDB {
 
+    // Strict whitelist for table/identifier names to mitigate SQL injection via config
+    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
 
     // Column indices are loaded from configs/db.properties at class initialization
     static int idColumnNumber;
@@ -35,6 +38,9 @@ public class CurrenciesDB {
             username = props.getProperty("username");
             password = props.getProperty("password");
             tableName = props.getProperty("tableNameCurrencies");
+            if (tableName == null || !SAFE_IDENTIFIER.matcher(tableName).matches()) {
+                throw new IllegalStateException("Unsafe table name for Currencies: " + tableName);
+            }
 
             idColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.id"));
             codeColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.code"));
@@ -58,16 +64,17 @@ public class CurrenciesDB {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
 
-                Statement statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-                while (resultSet.next()) {
-
-                    int id = resultSet.getInt(idColumnNumber);
-                    String code = resultSet.getString(codeColumnNumber);
-                    String fullName = resultSet.getString(fullNameColumnNumber);
-                    String sign = resultSet.getString(signColumnNumber);
-                    Currency currency = new Currency(id, code, fullName, sign);
-                    currencies.add(currency);
+                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
+                    try (ResultSet resultSet = ps.executeQuery()) {
+                        while (resultSet.next()) {
+                            int id = resultSet.getInt(idColumnNumber);
+                            String code = resultSet.getString(codeColumnNumber);
+                            String fullName = resultSet.getString(fullNameColumnNumber);
+                            String sign = resultSet.getString(signColumnNumber);
+                            Currency currency = new Currency(id, code, fullName, sign);
+                            currencies.add(currency);
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -84,13 +91,13 @@ public class CurrenciesDB {
                 String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        String code = resultSet.getString(codeColumnNumber);
-                        String fullName = resultSet.getString(fullNameColumnNumber);
-                        String sign = resultSet.getString(signColumnNumber);
-                        currency = new Currency(id, code, fullName, sign);
-
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            String code = resultSet.getString(codeColumnNumber);
+                            String fullName = resultSet.getString(fullNameColumnNumber);
+                            String sign = resultSet.getString(signColumnNumber);
+                            currency = new Currency(id, code, fullName, sign);
+                        }
                     }
                 }
             }
@@ -110,12 +117,13 @@ public class CurrenciesDB {
                 String sql = "SELECT * FROM " + tableName + " WHERE CODE = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setString(1, code.toUpperCase());
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        int id = resultSet.getInt(idColumnNumber);
-                        String fullName = resultSet.getString(fullNameColumnNumber);
-                        String sign = resultSet.getString(signColumnNumber);
-                        currency = new Currency(id, code.toUpperCase(), fullName, sign);
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            int id = resultSet.getInt(idColumnNumber);
+                            String fullName = resultSet.getString(fullNameColumnNumber);
+                            String sign = resultSet.getString(signColumnNumber);
+                            currency = new Currency(id, code.toUpperCase(), fullName, sign);
+                        }
                     }
                 }
             }

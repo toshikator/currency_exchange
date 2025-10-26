@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 
 public class ExchangeRatesDB {
@@ -23,6 +24,9 @@ public class ExchangeRatesDB {
     static int baseCurrencyIdColumnNumber;
     static int targetCurrencyIdColumnNumber;
     static int rateColumnNumber;
+
+    // Strict whitelist for table/identifier names to mitigate SQL injection via config
+    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
 
     static {
         try {
@@ -38,6 +42,9 @@ public class ExchangeRatesDB {
             username = props.getProperty("username");
             password = props.getProperty("password");
             tableName = props.getProperty("tableNameExchangeRates");
+            if (tableName == null || !SAFE_IDENTIFIER.matcher(tableName).matches()) {
+                throw new IllegalStateException("Unsafe table name for ExchangeRates: " + tableName);
+            }
 
             idColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.id"));
             baseCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.baseCurrencyId"));
@@ -65,8 +72,8 @@ public class ExchangeRatesDB {
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
                 String sql = "SELECT * FROM " + tableName + " WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    ps.setString(1, Integer.toString(baseCurrencyId));
-                    ps.setString(2, Integer.toString(targetCurrencyId));
+                    ps.setInt(1, baseCurrencyId);
+                    ps.setInt(2, targetCurrencyId);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             int id = rs.getInt(idColumnNumber);
@@ -94,16 +101,17 @@ public class ExchangeRatesDB {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
 
-                Statement statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-                while (resultSet.next()) {
-                    BigDecimal rate = new BigDecimal("1234.567989");
-                    int id = resultSet.getInt(idColumnNumber);
-                    int baseCurrency = resultSet.getInt(baseCurrencyIdColumnNumber);
-                    int targetCurrency = resultSet.getInt(targetCurrencyIdColumnNumber);
-                    rate = resultSet.getBigDecimal(rateColumnNumber);
-                    ExchangeRate exchangeRate = new ExchangeRate(id, baseCurrency, targetCurrency, rate);
-                    exchangeRates.add(exchangeRate);
+                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
+                    try (ResultSet resultSet = ps.executeQuery()) {
+                        while (resultSet.next()) {
+                            int id = resultSet.getInt(idColumnNumber);
+                            int baseCurrency = resultSet.getInt(baseCurrencyIdColumnNumber);
+                            int targetCurrency = resultSet.getInt(targetCurrencyIdColumnNumber);
+                            BigDecimal rate = resultSet.getBigDecimal(rateColumnNumber);
+                            ExchangeRate exchangeRate = new ExchangeRate(id, baseCurrency, targetCurrency, rate);
+                            exchangeRates.add(exchangeRate);
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -148,5 +156,28 @@ public class ExchangeRatesDB {
             System.err.println(e);
         }
         return exchangeRate;
+    }
+
+    public static ExchangeRate update(int baseCurrencyId, int targetCurrencyId, BigDecimal newRate) {
+        try {
+            Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
+            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+                String sql = "UPDATE " + tableName + " SET RATE = ? WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setBigDecimal(1, newRate);
+                    ps.setInt(2, baseCurrencyId);
+                    ps.setInt(3, targetCurrencyId);
+                    int updated = ps.executeUpdate();
+                    if (updated == 0) {
+                        return null;
+                    }
+                }
+            }
+            return selectRate(baseCurrencyId, targetCurrencyId);
+        } catch (Exception e) {
+            System.out.println("update exception: " + e);
+            System.err.println(e);
+            return null;
+        }
     }
 }
