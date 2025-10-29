@@ -25,6 +25,9 @@
             <scope>provided</scope>
         </dependency>
 
+        
+
+
         <!-- Oracle JDBC Driver (local jar) -->
         <!-- Using system scope to package the local ojdbc jar into the WAR. -->
         <dependency>
@@ -57,6 +60,18 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>4.0.3</version>
+        </dependency>
+
+        <!-- SLF4J API and Simple Logger -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.0-alpha1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.0-alpha1</version>
         </dependency>
 
         <dependency>

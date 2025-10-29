@@ -1,6 +1,11 @@
 G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\ShowDbServlet.java
-G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\Currency.java
-G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\Currency.java
-G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\CurrenciesList.java
-G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\com\example\currency_exchange\HelloServlet.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\ExchangeRateServlet.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\dto\DTOExchangeRate.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\CurrenciesServlet.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\CurrencyServlet.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\DbConnection\HikariPool.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\view\ExchangeRatesServlet.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\DbConnection\ExchangeRatesDB.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\entities\Currency.java
 G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\DbConnection\CurrenciesDB.java
+G:\YandexDisk\BackEndStudies\BySergeyZhukov\currency_exchange\src\main\java\third_project\entities\ExchangeRate.java

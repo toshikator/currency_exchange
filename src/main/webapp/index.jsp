@@ -67,12 +67,6 @@
     <input type="submit" value="Submit">
 </form>
 
-<h3>Patch exchange rate</h3>
-<form class="form-window" action="exchangerate/usdeur" method=enctype="application/x-www-form-urlencoded">
-    name: <input type="text" name="name"/><br><br>
-    code: <input type="text" name="code"/><br><br>
-    sign: <input type="text" name="sign"/><br><br>
-    <input type="submit" value="Submit">
-</form>
+
 </body>
 </html>

@@ -33,6 +33,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map(DTOExchangeRate::new).collect(Collectors.toList());
             if (exchangeRates == null || exchangeRates.isEmpty()) {
+                System.err.println("empty dataset of DTOs");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -40,6 +41,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             mapper.writeValue(response.getWriter(), exchangeRates);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
+            System.err.println("servlet global error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -56,6 +58,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 
             if (baseCurrencyCode == null || targetCurrencyCode == null || rateParam == null
                     || baseCurrencyCode.trim().isEmpty() || targetCurrencyCode.trim().isEmpty() || rateParam.trim().isEmpty()) {
+                System.err.println("invalid parameters");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -64,6 +67,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             targetCurrencyCode = targetCurrencyCode.toUpperCase();
 
             if (baseCurrencyCode.equals(targetCurrencyCode)) {
+                System.err.println("base and target currencies must be different");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -72,6 +76,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             Currency targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
 
             if (baseCurrency == null || targetCurrency == null) {
+                System.err.println("invalid currency code");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -80,23 +85,27 @@ public class ExchangeRatesServlet extends HttpServlet {
             try {
                 rate = new BigDecimal(rateParam);
             } catch (NumberFormatException nfe) {
+                System.err.println("rate must be a number");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             if (rate.compareTo(BigDecimal.ZERO) <= 0) {
+                System.err.println("rate must be positive");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             ExchangeRate existing = ExchangeRatesDB.selectRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
+                System.err.println("exchange rate already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
 
             ExchangeRate created = ExchangeRatesDB.insert(baseCurrencyCode, targetCurrencyCode, rate);
             if (created == null) {
+                System.err.println("error while inserting exchange rate");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }

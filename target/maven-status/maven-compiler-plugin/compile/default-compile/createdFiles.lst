@@ -1,6 +1,11 @@
-com\example\currency_exchange\HelloServlet.class
-third_project\Currency.class
+third_project\view\ExchangeRatesServlet.class
 third_project\DbConnection\CurrenciesDB.class
-third_project\view\CurrenciesList.class
-third_project\view\Currency.class
+third_project\view\CurrenciesServlet.class
+third_project\DbConnection\ExchangeRatesDB.class
 third_project\view\ShowDbServlet.class
+third_project\DbConnection\HikariPool.class
+third_project\view\ExchangeRateServlet.class
+third_project\dto\DTOExchangeRate.class
+third_project\view\CurrencyServlet.class
+third_project\entities\Currency.class
+third_project\entities\ExchangeRate.class
