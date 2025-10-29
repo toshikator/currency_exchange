@@ -8,13 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import third_project.DbConnection.CurrenciesDB;
-import third_project.Currency;
+import third_project.entities.Currency;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
-public class Currencies extends HttpServlet {
+public class CurrenciesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

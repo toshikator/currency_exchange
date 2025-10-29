@@ -1,9 +1,7 @@
 package third_project.DbConnection;
 
-import third_project.Currency;
-import third_project.DTOExchangeRate;
-import third_project.ExchangeRate;
-import third_project.view.ExchangeRates;
+import third_project.entities.Currency;
+import third_project.entities.ExchangeRate;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -15,18 +13,16 @@ import java.util.regex.Pattern;
 
 public class ExchangeRatesDB {
 
+    // Strict whitelist for table/identifier names to mitigate SQL injection via config
+    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
     static String url;
     static String username;
     static String password;
     static String tableName;
-
     static int idColumnNumber;
     static int baseCurrencyIdColumnNumber;
     static int targetCurrencyIdColumnNumber;
     static int rateColumnNumber;
-
-    // Strict whitelist for table/identifier names to mitigate SQL injection via config
-    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
 
     static {
         try {
@@ -69,7 +65,7 @@ public class ExchangeRatesDB {
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            try (Connection conn = HikariPool.get().getConnection()) {
                 String sql = "SELECT * FROM " + tableName + " WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, baseCurrencyId);

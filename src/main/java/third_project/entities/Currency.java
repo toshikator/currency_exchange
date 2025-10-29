@@ -1,4 +1,4 @@
-package third_project;
+package third_project.entities;
 
 import java.io.Serializable;
 

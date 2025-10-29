@@ -1,6 +1,8 @@
-package third_project;
+package third_project.dto;
 
 import third_project.DbConnection.CurrenciesDB;
+import third_project.entities.Currency;
+import third_project.entities.ExchangeRate;
 
 import java.math.BigDecimal;
 

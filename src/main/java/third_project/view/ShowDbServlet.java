@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.DbConnection.CurrenciesDB;
-import third_project.Currency;
+import third_project.entities.Currency;
 
 import java.io.IOException;
 import java.io.PrintWriter;

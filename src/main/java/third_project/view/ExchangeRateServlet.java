@@ -5,10 +5,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.DTOExchangeRate;
+import third_project.dto.DTOExchangeRate;
 import third_project.DbConnection.CurrenciesDB;
 import third_project.DbConnection.ExchangeRatesDB;
-import third_project.ExchangeRate;
+import third_project.entities.ExchangeRate;
 
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 
 @WebServlet(name = "exchangerate", value = "/exchangerate/*")
-public class ExchangeRateShow extends HttpServlet {
+public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -99,7 +99,7 @@ public class ExchangeRateShow extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            
+
             ExchangeRate existing = ExchangeRatesDB.selectRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);

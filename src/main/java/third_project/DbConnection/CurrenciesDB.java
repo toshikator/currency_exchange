@@ -1,6 +1,6 @@
 package third_project.DbConnection;
 
-import third_project.Currency;
+import third_project.entities.Currency;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class CurrenciesDB {
         ArrayList<Currency> currencies = new ArrayList<Currency>();
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            try (Connection conn = HikariPool.get().getConnection()) {
 
                 try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
                     try (ResultSet resultSet = ps.executeQuery()) {

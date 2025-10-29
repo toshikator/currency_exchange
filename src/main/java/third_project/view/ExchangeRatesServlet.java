@@ -5,11 +5,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.Currency;
-import third_project.DTOExchangeRate;
+import third_project.entities.Currency;
+import third_project.dto.DTOExchangeRate;
 import third_project.DbConnection.CurrenciesDB;
 import third_project.DbConnection.ExchangeRatesDB;
-import third_project.ExchangeRate;
+import third_project.entities.ExchangeRate;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
-public class ExchangeRates extends HttpServlet {
+public class ExchangeRatesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public ExchangeRates() {
+    public ExchangeRatesServlet() {
         super();
     }
 
@@ -88,7 +88,7 @@ public class ExchangeRates extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            
+
             ExchangeRate existing = ExchangeRatesDB.selectRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);

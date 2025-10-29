@@ -5,15 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.Currency;
+import third_project.entities.Currency;
 import third_project.DbConnection.CurrenciesDB;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Locale;
 
 @WebServlet(name = "currency", value = "/currency/*")
-public class CurrencyShow extends HttpServlet {
+public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
