@@ -2,7 +2,6 @@ package third_project.dto;
 
 import third_project.DbConnection.CurrenciesDB;
 import third_project.entities.Currency;
-import third_project.entities.ExchangeRate;
 
 import java.math.BigDecimal;
 
@@ -19,9 +18,9 @@ public class DTOExchangeRate implements java.io.Serializable {
     public DTOExchangeRate(int id, int baseCurrencyId, int targetCurrencyId, BigDecimal rate) {
         this.id = id;
         try {
-            this.baseCurrency = CurrenciesDB.selectOne(baseCurrencyId);
+            this.baseCurrency = CurrenciesDB.findById(baseCurrencyId);
             if (this.baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency ID provided");
-            this.targetCurrency = CurrenciesDB.selectOne(targetCurrencyId);
+            this.targetCurrency = CurrenciesDB.findById(targetCurrencyId);
             if (this.targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency ID provided");
 
         } catch (IllegalArgumentException e) {
@@ -30,19 +29,6 @@ public class DTOExchangeRate implements java.io.Serializable {
         this.rate = rate;
     }
 
-    public DTOExchangeRate(ExchangeRate exchangeRate) {
-        this.id = exchangeRate.getId();
-        try {
-            this.baseCurrency = CurrenciesDB.selectOne(exchangeRate.getBaseCurrencyCode());
-            if (this.baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency ID provided");
-            this.targetCurrency = CurrenciesDB.selectOne(exchangeRate.getTargetCurrencyCode());
-            if (this.targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency ID provided");
-
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid currency ID provided", e);
-        }
-        this.rate = exchangeRate.getRate();
-    }
 
     @Override
     public String toString() {

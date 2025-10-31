@@ -58,7 +58,7 @@ public class ExchangeRatesDB {
     /**
      * Returns the exchange rate for base->target if present, or null when not found.
      */
-    public static ExchangeRate selectRate(int baseCurrencyId, int targetCurrencyId) {
+    public static ExchangeRate findRate(int baseCurrencyId, int targetCurrencyId) {
         if (baseCurrencyId == 0 || targetCurrencyId == 0) return null;
 
         if (baseCurrencyId == targetCurrencyId) return null; // trivial case
@@ -120,9 +120,9 @@ public class ExchangeRatesDB {
         Currency baseCurrency = null;
         Currency targetCurrency = null;
         try {
-            baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
+            baseCurrency = CurrenciesDB.findByCode(baseCurrencyCode);
             if (baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency code provided");
-            targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
+            targetCurrency = CurrenciesDB.findByCode(targetCurrencyCode);
             if (targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency code provided");
 
         } catch (Exception e) {
@@ -146,7 +146,7 @@ public class ExchangeRatesDB {
                     ps.executeUpdate();
                 }
             }
-            exchangeRate = ExchangeRatesDB.selectRate(CurrenciesDB.selectOne(baseCurrencyCode).getId(), CurrenciesDB.selectOne(targetCurrencyCode).getId());
+            exchangeRate = ExchangeRatesDB.findRate(CurrenciesDB.findById(baseCurrencyCode).getId(), CurrenciesDB.findById(targetCurrencyCode).getId());
         } catch (Exception e) {
             System.out.println("insert exception: " + e);
             System.err.println(e);
@@ -169,7 +169,7 @@ public class ExchangeRatesDB {
                     }
                 }
             }
-            return selectRate(baseCurrencyId, targetCurrencyId);
+            return findRate(baseCurrencyId, targetCurrencyId);
         } catch (Exception e) {
             System.out.println("update exception: " + e);
             System.err.println(e);

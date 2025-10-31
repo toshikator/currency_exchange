@@ -39,10 +39,10 @@ public class ExchangeRateServlet extends HttpServlet {
                 return;
             }
             PrintWriter out = response.getWriter();
-            int baseCurrencyId = CurrenciesDB.selectOne(baseCurrencyCode).getId();
-            int targetCurrencyId = CurrenciesDB.selectOne(targetCurrencyCode).getId();
-            ExchangeRate rate = ExchangeRatesDB.selectRate(baseCurrencyId, targetCurrencyId);
-            out.println(new DTOExchangeRate(rate));
+            int baseCurrencyId = CurrenciesDB.findByCode(baseCurrencyCode).getId();
+            int targetCurrencyId = CurrenciesDB.findByCode(targetCurrencyCode).getId();
+            ExchangeRate rate = ExchangeRatesDB.findRate(baseCurrencyId, targetCurrencyId);
+            out.println(new DTOExchangeRate(rate.getId(), baseCurrencyId, targetCurrencyId, rate.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -93,14 +93,14 @@ public class ExchangeRateServlet extends HttpServlet {
             int baseCurrencyId = 0;
             int targetCurrencyId = 0;
             try {
-                baseCurrencyId = CurrenciesDB.selectOne(baseCurrencyCode).getId();
-                targetCurrencyId = CurrenciesDB.selectOne(targetCurrencyCode).getId();
+                baseCurrencyId = CurrenciesDB.findByCode(baseCurrencyCode).getId();
+                targetCurrencyId = CurrenciesDB.findByCode(targetCurrencyCode).getId();
             } catch (NullPointerException npe) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            ExchangeRate existing = ExchangeRatesDB.selectRate(baseCurrencyId, targetCurrencyId);
+            ExchangeRate existing = ExchangeRatesDB.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -113,7 +113,7 @@ public class ExchangeRateServlet extends HttpServlet {
             }
 
             PrintWriter out = response.getWriter();
-            out.println(new DTOExchangeRate(updated));
+            out.println(new DTOExchangeRate(updated.getId(), baseCurrencyId, targetCurrencyId, updated.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -22,7 +22,7 @@ public class ShowDbServlet extends HttpServlet {
     public void doGet(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         try {
-            List<Currency> currencies = CurrenciesDB.select();
+            List<Currency> currencies = CurrenciesDB.getAllCurrencies();
 
             if (currencies == null || currencies.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -56,7 +56,7 @@ public class CurrenciesDB {
         }
     }
 
-    public static ArrayList<Currency> select() {
+    public static ArrayList<Currency> getAllCurrencies() {
 
 
         ArrayList<Currency> currencies = new ArrayList<Currency>();
@@ -83,7 +83,7 @@ public class CurrenciesDB {
         return currencies;
     }
 
-    public static Currency selectOne(int id) {
+    public static Currency findById(int id) {
         Currency currency = null;
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
@@ -109,7 +109,7 @@ public class CurrenciesDB {
         return currency;
     }
 
-    public static Currency selectOne(String code) throws SQLException {
+    public static Currency findByCode(String code) throws SQLException {
         Currency currency = null;
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
@@ -148,7 +148,7 @@ public class CurrenciesDB {
                     preparedStatement.setString(2, currency.getSign());
                     preparedStatement.setString(3, currency.getFullName());
                     preparedStatement.executeUpdate();
-                    return selectOne(currency.getCode());
+                    return findByCode(currency.getCode());
                 }
             }
         } catch (Exception ex) {
@@ -181,7 +181,7 @@ public class CurrenciesDB {
         return 0;
     }
 
-    public static int delete(int id) {
+    public static int deleteById(int id) {
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();

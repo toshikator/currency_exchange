@@ -23,7 +23,7 @@ public class CurrencyServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            Currency currency = CurrenciesDB.selectOne(pathInfo.substring(1));
+            Currency currency = CurrenciesDB.findByCode(pathInfo.substring(1));
             if (currency == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;

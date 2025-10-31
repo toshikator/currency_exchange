@@ -27,7 +27,7 @@ public class CurrenciesServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            if (CurrenciesDB.selectOne(code) != null) {
+            if (CurrenciesDB.findByCode(code) != null) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
@@ -36,7 +36,7 @@ public class CurrenciesServlet extends HttpServlet {
             currency.setCode(code);
             currency.setSign(sign);
             CurrenciesDB.insert(currency);
-            int id = CurrenciesDB.selectOne(code).getId();
+            int id = CurrenciesDB.findByCode(code).getId();
             currency.setId(id);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), currency);
@@ -51,7 +51,7 @@ public class CurrenciesServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<Currency> currencies = CurrenciesDB.select();
+            List<Currency> currencies = CurrenciesDB.getAllCurrencies();
             if (currencies == null || currencies.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;

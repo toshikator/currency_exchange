@@ -31,7 +31,14 @@ public class ExchangeRatesServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map(DTOExchangeRate::new).collect(Collectors.toList());
+            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map((exchangeRate) -> {
+                DTOExchangeRate result = new DTOExchangeRate();
+                result.setId(exchangeRate.getId());
+                result.setBaseCurrency(CurrenciesDB.findById(exchangeRate.getBaseCurrencyCode()));
+                result.setTargetCurrency(CurrenciesDB.findById(exchangeRate.getTargetCurrencyCode()));
+                result.setRate(exchangeRate.getRate());
+                return result;
+            }).collect(Collectors.toList());
             if (exchangeRates == null || exchangeRates.isEmpty()) {
                 System.err.println("empty dataset of DTOs");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -72,8 +79,8 @@ public class ExchangeRatesServlet extends HttpServlet {
                 return;
             }
 
-            Currency baseCurrency = CurrenciesDB.selectOne(baseCurrencyCode);
-            Currency targetCurrency = CurrenciesDB.selectOne(targetCurrencyCode);
+            Currency baseCurrency = CurrenciesDB.findByCode(baseCurrencyCode);
+            Currency targetCurrency = CurrenciesDB.findByCode(targetCurrencyCode);
 
             if (baseCurrency == null || targetCurrency == null) {
                 System.err.println("invalid currency code");
@@ -96,7 +103,7 @@ public class ExchangeRatesServlet extends HttpServlet {
                 return;
             }
 
-            ExchangeRate existing = ExchangeRatesDB.selectRate(baseCurrency.getId(), targetCurrency.getId());
+            ExchangeRate existing = ExchangeRatesDB.findRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
                 System.err.println("exchange rate already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -110,7 +117,7 @@ public class ExchangeRatesServlet extends HttpServlet {
                 return;
             }
 
-            DTOExchangeRate dto = new DTOExchangeRate(created);
+            DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency.getId(), targetCurrency.getId(), rate);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), dto);
             response.setStatus(HttpServletResponse.SC_CREATED);
