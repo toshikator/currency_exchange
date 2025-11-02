@@ -1,4 +1,4 @@
-package third_project.view;
+package third_project.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

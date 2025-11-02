@@ -1,4 +1,4 @@
-package third_project.view;
+package third_project.servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.entities.Currency;
 import third_project.DbConnection.CurrenciesDB;
+import third_project.service.Validation;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,15 +24,19 @@ public class CurrencyServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            Currency currency = CurrenciesDB.findByCode(pathInfo.substring(1));
+            Currency currency;
+
+            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1)) ? CurrenciesDB.findByCode(pathInfo.substring(1)) : null;
             if (currency == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                throw new ServletException("Currency not found");
             }
             PrintWriter out = response.getWriter();
             out.println(currency);
             response.setStatus(HttpServletResponse.SC_OK);
 
+        } catch (ServletException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

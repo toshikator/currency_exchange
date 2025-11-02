@@ -102,7 +102,7 @@ public class CurrenciesDB {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Exception in selectOne by Currency id");
+            System.out.println("Exception in findById");
             System.out.println("Currency id = " + id);
             System.out.println(ex);
         }
@@ -136,7 +136,7 @@ public class CurrenciesDB {
         return currency;
     }
 
-    public static Currency insert(Currency currency) {
+    public static Currency insert(String code, String name, String sign) {
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
@@ -144,11 +144,11 @@ public class CurrenciesDB {
 
                 String sql = "INSERT INTO " + tableName + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(1, currency.getCode().toUpperCase());
-                    preparedStatement.setString(2, currency.getSign());
-                    preparedStatement.setString(3, currency.getFullName());
+                    preparedStatement.setString(1, code.toUpperCase());
+                    preparedStatement.setString(2, sign);
+                    preparedStatement.setString(3, name);
                     preparedStatement.executeUpdate();
-                    return findByCode(currency.getCode());
+                    return findByCode(code);
                 }
             }
         } catch (Exception ex) {

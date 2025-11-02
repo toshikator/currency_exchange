@@ -1,4 +1,4 @@
-package third_project.view;
+package third_project.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,8 +34,8 @@ public class ExchangeRatesServlet extends HttpServlet {
             List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
-                result.setBaseCurrency(CurrenciesDB.findById(exchangeRate.getBaseCurrencyCode()));
-                result.setTargetCurrency(CurrenciesDB.findById(exchangeRate.getTargetCurrencyCode()));
+                result.setBaseCurrency(CurrenciesDB.findById(exchangeRate.getBaseCurrencyId()));
+                result.setTargetCurrency(CurrenciesDB.findById(exchangeRate.getTargetCurrencyId()));
                 result.setRate(exchangeRate.getRate());
                 return result;
             }).collect(Collectors.toList());

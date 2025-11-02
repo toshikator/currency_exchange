@@ -1,4 +1,4 @@
-package third_project.view;
+package third_project.servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -31,13 +31,7 @@ public class CurrenciesServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
-            Currency currency = new Currency();
-            currency.setFullName(name);
-            currency.setCode(code);
-            currency.setSign(sign);
-            CurrenciesDB.insert(currency);
-            int id = CurrenciesDB.findByCode(code).getId();
-            currency.setId(id);
+            Currency currency = CurrenciesDB.insert(code, name, sign);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_CREATED);

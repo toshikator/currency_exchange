@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 
 public class ExchangeRate implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int baseCurrencyCode;
-    private int targetCurrencyCode;
+    private int baseCurrencyId;
+    private int targetCurrencyId;
     private BigDecimal rate;
     private int id;
 
@@ -16,26 +16,26 @@ public class ExchangeRate implements Serializable {
 
     public ExchangeRate(int id, int baseCurrencyId, int targetCurrencyId, BigDecimal rate) {
         this.id = id;
-        this.baseCurrencyCode = baseCurrencyId;
-        this.targetCurrencyCode = targetCurrencyId;
+        this.baseCurrencyId = baseCurrencyId;
+        this.targetCurrencyId = targetCurrencyId;
         this.rate = rate;
 
     }
 
-    public int getBaseCurrencyCode() {
-        return baseCurrencyCode;
+    public int getBaseCurrencyId() {
+        return baseCurrencyId;
     }
 
-    public void setBaseCurrencyCode(int baseCurrencyCode) {
-        this.baseCurrencyCode = baseCurrencyCode;
+    public void setBaseCurrencyId(int baseCurrencyId) {
+        this.baseCurrencyId = baseCurrencyId;
     }
 
-    public int getTargetCurrencyCode() {
-        return targetCurrencyCode;
+    public int getTargetCurrencyId() {
+        return targetCurrencyId;
     }
 
-    public void setTargetCurrencyCode(int targetCurrencyCode) {
-        this.targetCurrencyCode = targetCurrencyCode;
+    public void setTargetCurrencyId(int targetCurrencyId) {
+        this.targetCurrencyId = targetCurrencyId;
     }
 
     public BigDecimal getRate() {
@@ -54,8 +54,8 @@ public class ExchangeRate implements Serializable {
     public String toString() {
         return "{" +
                 "id=" + id +
-                "baseCurrencyCode='" + baseCurrencyCode + '\'' +
-                ", targetCurrencyCode='" + targetCurrencyCode + '\'' +
+                "baseCurrencyCode='" + baseCurrencyId + '\'' +
+                ", targetCurrencyCode='" + targetCurrencyId + '\'' +
                 ", rate=" + rate +
                 '}';
     }
