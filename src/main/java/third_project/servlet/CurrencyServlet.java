@@ -15,19 +15,22 @@ import java.io.PrintWriter;
 
 @WebServlet(name = "currency", value = "/currency/*")
 public class CurrencyServlet extends HttpServlet {
-    private final CurrenciesDbConnector currenciesDbConnector;
+    private CurrenciesDbConnector currenciesDbConnector;
+    private Validation validator;
     private DataSource ds;
 
     public CurrencyServlet() {
         super();
-        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
     }
 
     @Override
     public void init() throws ServletException {
+        super.init();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        if (currenciesDbConnector == null) throw new ServletException("currenciesDbConnector not found in ServletContext");
+        validator = new Validation();
         ds = (DataSource) getServletContext().getAttribute("datasource");
-        if (ds == null) throw new ServletException("DataSource not found in ServletContext");
-
+        // ds may be optional for this servlet; don't fail deployment if it's not required here
     }
 
     @Override
@@ -42,7 +45,7 @@ public class CurrencyServlet extends HttpServlet {
             }
             Currency currency;
 
-            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1)) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
+            currency = validator.isCurrencyExist(request.getPathInfo().substring(1)) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
             if (currency == null) {
                 throw new ServletException("Currency not found");
             }

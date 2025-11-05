@@ -1,5 +1,6 @@
 package third_project.DbConnection;
 
+
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 
@@ -23,6 +24,7 @@ public class ExchangeRatesDbConnector {
     static int rateColumnNumber;
     static CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
     private final DataSource ds;
+
 
     public ExchangeRatesDbConnector() {
         try {
@@ -56,7 +58,7 @@ public class ExchangeRatesDbConnector {
         this.ds = HikariPool.get();
     }
 
-    
+
     public static ExchangeRate findRate(int baseCurrencyId, int targetCurrencyId) {
         if (baseCurrencyId == 0 || targetCurrencyId == 0) return null;
 

@@ -19,13 +19,20 @@ import java.math.BigDecimal;
 
 @WebServlet(name = "exchangerate", value = "/exchangerate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    private final CurrenciesDbConnector currenciesDbConnector;
-    private final ExchangeRatesDbConnector exchangeRatesDbConnector;
+    private CurrenciesDbConnector currenciesDbConnector;
+    private ExchangeRatesDbConnector exchangeRatesDbConnector;
 
     public ExchangeRateServlet() {
         super();
+    }
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        if (currenciesDbConnector == null) throw new ServletException("currenciesDbConnector not found in ServletContext");
         exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
+        if (exchangeRatesDbConnector == null) throw new ServletException("exchangeRatesDbConnector not found in ServletContext");
     }
 
     @Override

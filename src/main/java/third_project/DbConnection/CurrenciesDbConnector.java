@@ -1,23 +1,17 @@
 package third_project.DbConnection;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
+
 import third_project.entities.Currency;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
+
 
 import javax.sql.DataSource;
-import javax.sql.DataSource;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 
-@ApplicationScoped
 public class CurrenciesDbConnector {
 
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
@@ -38,7 +32,11 @@ public class CurrenciesDbConnector {
                     props.load(in);
                 }
             }
-            this.tableName = props.getProperty("currencies.table.name");
+            String tbl = props.getProperty("currencies.table.name");
+            if (tbl == null || tbl.isEmpty()) {
+                tbl = props.getProperty("tableNameCurrencies");
+            }
+            this.tableName = tbl;
             idColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.id"));
             codeColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.code"));
             fullNameColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.fullName"));

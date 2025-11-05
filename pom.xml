@@ -10,12 +10,6 @@
     <name>currency_exchange</name>
     <packaging>war</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>8</maven.compiler.target>
-        <maven.compiler.source>8</maven.compiler.source>
-        <junit.version>5.13.2</junit.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -53,11 +47,6 @@
             <version>2.17.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.jboss.weld.servlet</groupId>
-            <artifactId>weld-servlet-shaded</artifactId>
-            <version>6.0.3.Final</version>
-        </dependency>
 
         <!-- Connection pool -->
         <dependency>
@@ -78,38 +67,28 @@
             <version>2.0.0-alpha1</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${project.basedir}/src/main/lib</directory>
-                            <includes>
-                                <include>**/*.jar</include>
-                            </includes>
-                            <targetPath>WEB-INF/lib</targetPath>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+    <!--    <build>-->
+    <!--        <plugins>-->
+    <!--            <plugin>-->
+    <!--                <groupId>org.apache.maven.plugins</groupId>-->
+    <!--                <artifactId>maven-war-plugin</artifactId>-->
+    <!--                <version>3.4.0</version>-->
+    <!--                <configuration>-->
+    <!--                    <webResources>-->
+    <!--                        <resource>-->
+    <!--                            <directory>${project.basedir}/src/main/lib</directory>-->
+    <!--                            <includes>-->
+    <!--                                <include>**/*.jar</include>-->
+    <!--                            </includes>-->
+    <!--                            <targetPath>WEB-INF/lib</targetPath>-->
+    <!--                        </resource>-->
+    <!--                    </webResources>-->
+    <!--                </configuration>-->
+    <!--            </plugin>-->
+    <!--        </plugins>-->
+    <!--    </build>-->
 </project>

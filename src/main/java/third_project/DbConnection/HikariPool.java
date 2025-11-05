@@ -29,11 +29,23 @@ public final class HikariPool {
             password = props.getProperty("password");
 
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
+            // Ensure Oracle JDBC driver is registered for DriverManager/ServiceLoader on newer JDKs
+            try {
+                Class.forName("oracle.jdbc.OracleDriver");
+            } catch (ClassNotFoundException cnfe) {
+                throw new RuntimeException("Oracle JDBC driver class not found. Ensure ojdbc JAR is on the classpath.", cnfe);
+            }
+
             HikariConfig cfg = new HikariConfig();
             cfg.setJdbcUrl(url);
             cfg.setUsername(username);
             cfg.setPassword(password);
+            // Explicitly declare the driver so Hikari doesn't rely on auto-detection
+            cfg.setDriverClassName("oracle.jdbc.OracleDriver");
             cfg.setPoolName("app-pool");
+            // Do not fail deployment if DB is temporarily unavailable
+            cfg.setInitializationFailTimeout(-1);
+            cfg.setMinimumIdle(0);
             ds = new HikariDataSource(cfg);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
