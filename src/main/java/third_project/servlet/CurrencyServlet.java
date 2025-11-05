@@ -6,14 +6,30 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.entities.Currency;
-import third_project.DbConnection.CurrenciesDB;
+import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.service.Validation;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet(name = "currency", value = "/currency/*")
 public class CurrencyServlet extends HttpServlet {
+    private final CurrenciesDbConnector currenciesDbConnector;
+    private DataSource ds;
+
+    public CurrencyServlet() {
+        super();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+    }
+
+    @Override
+    public void init() throws ServletException {
+        ds = (DataSource) getServletContext().getAttribute("datasource");
+        if (ds == null) throw new ServletException("DataSource not found in ServletContext");
+
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -26,7 +42,7 @@ public class CurrencyServlet extends HttpServlet {
             }
             Currency currency;
 
-            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1)) ? CurrenciesDB.findByCode(pathInfo.substring(1)) : null;
+            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1)) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
             if (currency == null) {
                 throw new ServletException("Currency not found");
             }

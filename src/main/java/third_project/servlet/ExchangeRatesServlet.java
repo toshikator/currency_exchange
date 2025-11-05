@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.entities.Currency;
 import third_project.dto.DTOExchangeRate;
-import third_project.DbConnection.CurrenciesDB;
-import third_project.DbConnection.ExchangeRatesDB;
+import third_project.DbConnection.CurrenciesDbConnector;
+import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.ExchangeRate;
 
 import java.io.IOException;
@@ -19,9 +19,13 @@ import java.util.stream.Collectors;
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private final CurrenciesDbConnector currenciesDbConnector;
+    private final ExchangeRatesDbConnector exchangeRatesDbConnector;
 
     public ExchangeRatesServlet() {
         super();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
     }
 
     @Override
@@ -31,11 +35,11 @@ public class ExchangeRatesServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<DTOExchangeRate> exchangeRates = ExchangeRatesDB.selectAll().parallelStream().map((exchangeRate) -> {
+            List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
-                result.setBaseCurrency(CurrenciesDB.findById(exchangeRate.getBaseCurrencyId()));
-                result.setTargetCurrency(CurrenciesDB.findById(exchangeRate.getTargetCurrencyId()));
+                result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId()));
+                result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId()));
                 result.setRate(exchangeRate.getRate());
                 return result;
             }).collect(Collectors.toList());
@@ -79,8 +83,8 @@ public class ExchangeRatesServlet extends HttpServlet {
                 return;
             }
 
-            Currency baseCurrency = CurrenciesDB.findByCode(baseCurrencyCode);
-            Currency targetCurrency = CurrenciesDB.findByCode(targetCurrencyCode);
+            Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
+            Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
 
             if (baseCurrency == null || targetCurrency == null) {
                 System.err.println("invalid currency code");
@@ -103,21 +107,21 @@ public class ExchangeRatesServlet extends HttpServlet {
                 return;
             }
 
-            ExchangeRate existing = ExchangeRatesDB.findRate(baseCurrency.getId(), targetCurrency.getId());
+            ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
                 System.err.println("exchange rate already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
 
-            ExchangeRate created = ExchangeRatesDB.insert(baseCurrencyCode, targetCurrencyCode, rate);
+            ExchangeRate created = exchangeRatesDbConnector.insert(baseCurrencyCode, targetCurrencyCode, rate);
             if (created == null) {
                 System.err.println("error while inserting exchange rate");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
-            DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency.getId(), targetCurrency.getId(), rate);
+            DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency, targetCurrency, rate);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), dto);
             response.setStatus(HttpServletResponse.SC_CREATED);

@@ -3,7 +3,7 @@ package third_project.servlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.DbConnection.CurrenciesDB;
+import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
 
 import java.io.IOException;
@@ -13,16 +13,17 @@ import java.util.List;
 @WebServlet(name = "showDbServlet", value = "/show-db")
 public class ShowDbServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private final CurrenciesDbConnector currenciesDbConnector;
 
     public ShowDbServlet() {
         super();
-        CurrenciesDB currenciesDB = new CurrenciesDB();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
     }
 
     public void doGet(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         try {
-            List<Currency> currencies = CurrenciesDB.getAllCurrencies();
+            List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
 
             if (currencies == null || currencies.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

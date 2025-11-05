@@ -49,6 +49,8 @@
 <a href="currencies">All currencies JSON</a>
 <br/>
 <a href="exchangeRates">All exchange rates JSON</a>
+<br/>
+<a href="test">test context</a>
 
 
 <h3>Post exchange rate</h3>

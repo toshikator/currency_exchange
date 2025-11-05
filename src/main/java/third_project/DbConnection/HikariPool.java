@@ -5,20 +5,19 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
-public class HikariPool {
-    private static final HikariDataSource DS;
-    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    private static final String username;
-    private static final String password;
-    private static final String tableName;
-    private static final String url;
+public final class HikariPool {
+    private static volatile HikariPool INSTANCE;
 
-    static {
+    private final HikariDataSource ds;
+    private final String username;
+    private final String password;
+    private final String url;
+
+    private HikariPool() {
         try {
             Properties props = new Properties();
-            try (java.io.InputStream in = CurrenciesDB.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
+            try (java.io.InputStream in = HikariPool.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
                 if (in != null) {
                     props.load(in);
                 }
@@ -28,10 +27,6 @@ public class HikariPool {
             String databaseName = props.getProperty("databaseName");
             username = props.getProperty("username");
             password = props.getProperty("password");
-            tableName = props.getProperty("tableNameCurrencies");
-            if (tableName == null || !SAFE_IDENTIFIER.matcher(tableName).matches()) {
-                throw new IllegalStateException("Unsafe table name for: " + tableName);
-            }
 
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
             HikariConfig cfg = new HikariConfig();
@@ -39,7 +34,7 @@ public class HikariPool {
             cfg.setUsername(username);
             cfg.setPassword(password);
             cfg.setPoolName("app-pool");
-            DS = new HikariDataSource(cfg);
+            ds = new HikariDataSource(cfg);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
@@ -55,14 +50,28 @@ public class HikariPool {
         }
     }
 
-    private HikariPool() {
-    }
-
     public static DataSource get() {
-        return DS;
+        HikariPool local = INSTANCE;
+        if (local == null) {
+            synchronized (HikariPool.class) {
+                local = INSTANCE;
+                if (local == null) {
+                    local = new HikariPool();
+                    INSTANCE = local;
+                }
+            }
+        }
+        return local.ds;
     }
 
     public static void shutdown() {
-        DS.close();
+        HikariPool local = INSTANCE;
+        if (local != null) {
+            try {
+                local.ds.close();
+            } finally {
+                INSTANCE = null;
+            }
+        }
     }
 }

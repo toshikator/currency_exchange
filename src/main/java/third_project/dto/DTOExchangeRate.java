@@ -1,6 +1,6 @@
 package third_project.dto;
 
-import third_project.DbConnection.CurrenciesDB;
+import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
 
 import java.math.BigDecimal;
@@ -15,12 +15,12 @@ public class DTOExchangeRate implements java.io.Serializable {
     public DTOExchangeRate() {
     }
 
-    public DTOExchangeRate(int id, int baseCurrencyId, int targetCurrencyId, BigDecimal rate) {
+    public DTOExchangeRate(int id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
         this.id = id;
         try {
-            this.baseCurrency = CurrenciesDB.findById(baseCurrencyId);
+            this.baseCurrency = baseCurrency;
             if (this.baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency ID provided");
-            this.targetCurrency = CurrenciesDB.findById(targetCurrencyId);
+            this.targetCurrency = targetCurrency;
             if (this.targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency ID provided");
 
         } catch (IllegalArgumentException e) {

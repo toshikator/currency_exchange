@@ -6,8 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.dto.DTOExchangeRate;
-import third_project.DbConnection.CurrenciesDB;
-import third_project.DbConnection.ExchangeRatesDB;
+import third_project.DbConnection.CurrenciesDbConnector;
+import third_project.DbConnection.ExchangeRatesDbConnector;
+import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 
 
@@ -18,6 +19,14 @@ import java.math.BigDecimal;
 
 @WebServlet(name = "exchangerate", value = "/exchangerate/*")
 public class ExchangeRateServlet extends HttpServlet {
+    private final CurrenciesDbConnector currenciesDbConnector;
+    private final ExchangeRatesDbConnector exchangeRatesDbConnector;
+
+    public ExchangeRateServlet() {
+        super();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,10 +48,10 @@ public class ExchangeRateServlet extends HttpServlet {
                 return;
             }
             PrintWriter out = response.getWriter();
-            int baseCurrencyId = CurrenciesDB.findByCode(baseCurrencyCode).getId();
-            int targetCurrencyId = CurrenciesDB.findByCode(targetCurrencyCode).getId();
-            ExchangeRate rate = ExchangeRatesDB.findRate(baseCurrencyId, targetCurrencyId);
-            out.println(new DTOExchangeRate(rate.getId(), baseCurrencyId, targetCurrencyId, rate.getRate()));
+            Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
+            Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
+            ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -93,27 +102,27 @@ public class ExchangeRateServlet extends HttpServlet {
             int baseCurrencyId = 0;
             int targetCurrencyId = 0;
             try {
-                baseCurrencyId = CurrenciesDB.findByCode(baseCurrencyCode).getId();
-                targetCurrencyId = CurrenciesDB.findByCode(targetCurrencyCode).getId();
+                baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode).getId();
+                targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode).getId();
             } catch (NullPointerException npe) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            ExchangeRate existing = ExchangeRatesDB.findRate(baseCurrencyId, targetCurrencyId);
+            ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            ExchangeRate updated = ExchangeRatesDB.update(baseCurrencyId, targetCurrencyId, newRate);
+            ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate);
             if (updated == null) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             PrintWriter out = response.getWriter();
-            out.println(new DTOExchangeRate(updated.getId(), baseCurrencyId, targetCurrencyId, updated.getRate()));
+            out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
