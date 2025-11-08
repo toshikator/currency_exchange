@@ -15,12 +15,22 @@ import java.util.List;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private final CurrenciesDbConnector currenciesDbConnector;
+    private CurrenciesDbConnector currenciesDbConnector;
 
     public CurrenciesServlet() {
-        this.currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        super();
     }
 
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        if (currenciesDbConnector == null) {
+            throw new ServletException("currenciesDbConnector not found in ServletContext");
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -30,10 +40,12 @@ public class CurrenciesServlet extends HttpServlet {
             String sign = request.getParameter("sign");
 
             if (name == null || code == null || sign == null) {
+                System.err.println("invalid parameters");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             if (currenciesDbConnector.findByCode(code) != null) {
+                System.err.println("currency with such code already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
@@ -42,10 +54,13 @@ public class CurrenciesServlet extends HttpServlet {
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {
+            System.out.println("error by currencies servlet, cause: " + e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -53,14 +68,17 @@ public class CurrenciesServlet extends HttpServlet {
             ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
             if (currencies == null || currencies.isEmpty()) {
+                System.out.println("error by currencies servlet, cause: currencies list is null or empty");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             mapper.writeValue(response.getWriter(), currencies);
-            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            System.out.println("error by currencies servlet, cause: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

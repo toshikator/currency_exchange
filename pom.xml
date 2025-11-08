@@ -71,24 +71,24 @@
     </dependencies>
 
 
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-war-plugin</artifactId>-->
-    <!--                <version>3.4.0</version>-->
-    <!--                <configuration>-->
-    <!--                    <webResources>-->
-    <!--                        <resource>-->
-    <!--                            <directory>${project.basedir}/src/main/lib</directory>-->
-    <!--                            <includes>-->
-    <!--                                <include>**/*.jar</include>-->
-    <!--                            </includes>-->
-    <!--                            <targetPath>WEB-INF/lib</targetPath>-->
-    <!--                        </resource>-->
-    <!--                    </webResources>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
-    <!--        </plugins>-->
-    <!--    </build>-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.basedir}/src/main/lib</directory>
+                            <includes>
+                                <include>**/*.jar</include>
+                            </includes>
+                            <targetPath>WEB-INF/lib</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

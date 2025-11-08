@@ -19,13 +19,24 @@ import java.util.stream.Collectors;
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private final CurrenciesDbConnector currenciesDbConnector;
-    private final ExchangeRatesDbConnector exchangeRatesDbConnector;
+    private CurrenciesDbConnector currenciesDbConnector;
+    private ExchangeRatesDbConnector exchangeRatesDbConnector;
 
     public ExchangeRatesServlet() {
         super();
+    }
+
+    @Override
+    public void init() throws jakarta.servlet.ServletException {
+        super.init();
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
+        if (currenciesDbConnector == null) {
+            throw new jakarta.servlet.ServletException("currenciesDbConnector not found in ServletContext");
+        }
         exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
+        if (exchangeRatesDbConnector == null) {
+            throw new jakarta.servlet.ServletException("exchangeRatesDbConnector not found in ServletContext");
+        }
     }
 
     @Override
