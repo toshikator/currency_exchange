@@ -6,4 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-
+# Ignore sensitive connectivity configuration
+src/main/resources/configs/connectivity.properties
+*.log
