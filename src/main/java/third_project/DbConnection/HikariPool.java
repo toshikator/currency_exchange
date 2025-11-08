@@ -17,7 +17,7 @@ public final class HikariPool {
     private HikariPool() {
         try {
             Properties props = new Properties();
-            try (java.io.InputStream in = HikariPool.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
+            try (java.io.InputStream in = HikariPool.class.getClassLoader().getResourceAsStream("configs/connectivity.properties")) {
                 if (in != null) {
                     props.load(in);
                 }
@@ -29,7 +29,6 @@ public final class HikariPool {
             password = props.getProperty("password");
 
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
-            // Ensure Oracle JDBC driver is registered for DriverManager/ServiceLoader on newer JDKs
             try {
                 Class.forName("oracle.jdbc.OracleDriver");
             } catch (ClassNotFoundException cnfe) {

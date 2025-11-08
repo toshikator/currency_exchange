@@ -1,0 +1,3 @@
+# Ignore sensitive connectivity configuration
+src/main/resources/configs/connectivity.properties
+*.log
