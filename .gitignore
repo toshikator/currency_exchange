@@ -2,3 +2,4 @@
 src/main/resources/configs/connectivity.properties
 *.log
 connectivity.*
+./target/*
