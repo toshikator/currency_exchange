@@ -6,9 +6,11 @@ third_project\DbConnection\HikariPool.class
 third_project\servlet\ExchangeRatesServlet.class
 third_project\servlet\TestServlet.class
 third_project\servlet\CurrenciesServlet.class
+third_project\dto\DTOExchange.class
 third_project\dto\DTOExchangeRate.class
 third_project\servlet\ExchangeRateServlet.class
 third_project\entities\Currency.class
 third_project\entities\ExchangeRate.class
+third_project\servlet\ExchangeServlet.class
 third_project\DbConnection\ExchangeRatesDbConnector.class
 third_project\servlet\ShowDbServlet.class

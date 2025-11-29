@@ -22,6 +22,13 @@ public class TestServlet extends HttpServlet {
     }
 
     @Override
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        resp.getWriter().write("PATCH OK");
+    }
+
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain; charset=UTF-8");
 

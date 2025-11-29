@@ -1,11 +1,6 @@
 $(document).ready(function () {
-    function getContextPath() {
-        var path = window.location.pathname || "";
-        var parts = path.split('/').filter(Boolean);
-        return parts.length > 0 ? '/' + parts[0] : '';
-    }
-
-    const host = getContextPath();
+    // const host = "http://localhost:8080/currency_exchange_war_exploded"
+    const host = "http://localhost:8080/"
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
@@ -57,14 +52,11 @@ $(document).ready(function () {
                 });
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                try {
-                    const error = JSON.parse(jqXHR.responseText);
-                    const toast = $('#api-error-toast');
-                    $(toast).find('.toast-body').text(error.message || 'Request failed');
-                    $(toast).toast('show');
-                } catch (e) {
-                    console.error('Request failed', jqXHR);
-                }
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
             }
         });
     }
@@ -82,14 +74,11 @@ $(document).ready(function () {
                 requestCurrencies();
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                try {
-                    const error = JSON.parse(jqXHR.responseText);
-                    const toast = $('#api-error-toast');
-                    $(toast).find('.toast-body').text(error.message || 'Request failed');
-                    $(toast).toast('show');
-                } catch (e) {
-                    console.error('Request failed', jqXHR);
-                }
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
             }
         });
 
@@ -111,25 +100,63 @@ $(document).ready(function () {
                     row.append($('<td></td>').text(currency));
                     row.append($('<td></td>').text(exchangeRate));
                     row.append($('<td></td>').html(
-                        '<button class="btn btn-secondary btn-sm exchange-rate-edit" data-bs-toggle="modal" data-bs-target="#edit-exchange-rate-modal">Edit</button>'
+                        '<button class="btn btn-secondary btn-sm exchange-rate-edit"' +
+                        'data-bs-toggle="modal" data-bs-target="#edit-exchange-rate-modal">Edit</button>'
                     ));
                     tbody.append(row);
                 });
             },
-            error: function (jqXHR) {
-                try {
-                    const error = JSON.parse(jqXHR.responseText);
-                    const toast = $('#api-error-toast');
-                    $(toast).find('.toast-body').text(error.message || 'Request failed');
-                    $(toast).toast('show');
-                } catch (e) {
-                    console.error('Request failed', jqXHR);
-                }
+            error: function () {
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
             }
         });
     }
 
     requestExchangeRates();
+
+    $(document).delegate('.exchange-rate-edit', 'click', function () {
+        // Get the currency and exchange rate from the row
+        const pair = $(this).closest('tr').find('td:first').text();
+        const exchangeRate = $(this).closest('tr').find('td:eq(1)').text();
+
+        // insert values into the modal
+        $('#edit-exchange-rate-modal .modal-title').text(`Edit ${pair} Exchange Rate`);
+        $('#edit-exchange-rate-modal #exchange-rate-input').val(exchangeRate);
+    });
+
+    // add event handler for edit exchange rate modal "Save" button
+    $('#edit-exchange-rate-modal .btn-primary').click(function () {
+        // get the currency pair and exchange rate from the modal
+        const pair = $('#edit-exchange-rate-modal .modal-title').text().replace('Edit ', '').replace(' Exchange Rate', '');
+        const exchangeRate = $('#edit-exchange-rate-modal #exchange-rate-input').val();
+
+        // send values to the server with a patch request
+        $.ajax({
+            url: `${host}/exchangeRate/${pair}`,
+            type: "PATCH",
+            contentType: "application/x-www-form-urlencoded",
+            data: `rate=${exchangeRate}`,
+            success: function () {
+                // set changed values to the table row
+                const row = $(`tr:contains(${pair})`);
+                row.find('td:eq(1)').text(exchangeRate);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
+            }
+        });
+
+        // close the modal
+        $('#edit-exchange-rate-modal').modal('hide');
+    });
 
     $("#add-exchange-rate").submit(function (e) {
         e.preventDefault();
@@ -138,64 +165,41 @@ $(document).ready(function () {
             url: `${host}/exchangeRates`,
             type: "POST",
             data: $("#add-exchange-rate").serialize(),
-            success: function () {
+            success: function (data) {
                 requestExchangeRates();
             },
-            error: function (jqXHR) {
-                try {
-                    const error = JSON.parse(jqXHR.responseText);
-                    const toast = $('#api-error-toast');
-                    $(toast).find('.toast-body').text(error.message || 'Request failed');
-                    $(toast).toast('show');
-                } catch (e) {
-                    console.error('Request failed', jqXHR);
-                }
+            error: function (jqXHR, textStatus, errorThrown) {
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
             }
         });
 
         return false;
     });
 
-    // Currency conversion form submission handler
     $("#convert").submit(function (e) {
         e.preventDefault();
 
-        const amount = parseFloat($("#convert-amount").val());
-        const baseCurrencyCode = $("#convert-base-currency").val();
-        const targetCurrencyCode = $("#convert-target-currency").val();
-
-        if (isNaN(amount)) {
-            alert("Please enter a valid number for amount.");
-            return false;
-        }
-
-        if (baseCurrencyCode === targetCurrencyCode) {
-            $("#convert-converted-amount").val(amount.toFixed(2));
-            return false;
-        }
+        const baseCurrency = $("#convert-base-currency").val();
+        const targetCurrency = $("#convert-target-currency").val();
+        const amount = $("#convert-amount").val();
 
         $.ajax({
-            url: `${host}/exchangeRate`,
+            url: `${host}/exchange?from=${baseCurrency}&to=${targetCurrency}&amount=${amount}`,
             type: "GET",
-            dataType: "json",
-            data: {
-                baseCurrencyCode: baseCurrencyCode,
-                targetCurrencyCode: targetCurrencyCode
+            // data: "$("#add-exchange-rate").serialize()",
+            success: function (data) {
+                $("#convert-converted-amount").val(data.convertedAmount);
             },
-            success: function (response) {
-                const rate = response.rate;
-                const convertedAmount = amount * rate;
-                $("#convert-converted-amount").val(convertedAmount.toFixed(2));
-            },
-            error: function (jqXHR) {
-                try {
-                    const error = JSON.parse(jqXHR.responseText);
-                    const toast = $('#api-error-toast');
-                    $(toast).find('.toast-body').text(error.message || 'Request failed');
-                    $(toast).toast('show');
-                } catch (e) {
-                    console.error('Request failed', jqXHR);
-                }
+            error: function (jqXHR, textStatus, errorThrown) {
+                const error = JSON.parse(jqXHR.responseText);
+                const toast = $('#api-error-toast');
+
+                $(toast).find('.toast-body').text(error.message);
+                toast.toast("show");
             }
         });
 

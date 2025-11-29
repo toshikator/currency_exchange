@@ -1,5 +1,6 @@
 package third_project.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.ServletException;
@@ -10,6 +11,7 @@ import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
+import third_project.service.Validation;
 
 
 import java.io.IOException;
@@ -30,9 +32,11 @@ public class ExchangeRateServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null) throw new ServletException("currenciesDbConnector not found in ServletContext");
+        if (currenciesDbConnector == null)
+            throw new ServletException("currenciesDbConnector not found in ServletContext");
         exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
-        if (exchangeRatesDbConnector == null) throw new ServletException("exchangeRatesDbConnector not found in ServletContext");
+        if (exchangeRatesDbConnector == null)
+            throw new ServletException("exchangeRatesDbConnector not found in ServletContext");
     }
 
     @Override
@@ -59,6 +63,7 @@ public class ExchangeRateServlet extends HttpServlet {
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
+            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate())));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -72,54 +77,42 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("doPatch called");
+        System.err.println("do patch called");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
             String pathInfo = request.getPathInfo();
-            if (pathInfo == null || pathInfo.length() < 7) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            System.out.println("pathInfo: " + pathInfo);
+            if (!Validation.isPatchRequestValid(pathInfo)) {
+                throw new IllegalArgumentException("Invalid pathInfo");
             }
-            String path = pathInfo.substring(1);
-            String baseCurrencyCode = path.substring(0, 3).toUpperCase();
-            String targetCurrencyCode = path.substring(3, 6).toUpperCase();
-            if (baseCurrencyCode.equals(targetCurrencyCode)) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+
+            String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
+            String targetCurrencyCode = pathInfo.substring(4, 7).toUpperCase();
 
             String rateParam = request.getParameter("rate");
-            if (rateParam == null || rateParam.trim().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            if (Validation.isStringValid(rateParam)) {
+                throw new IllegalArgumentException("Invalid rate parameter");
             }
 
-            BigDecimal newRate;
-            try {
-                newRate = new BigDecimal(rateParam);
-            } catch (NumberFormatException nfe) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-            if (newRate.compareTo(BigDecimal.ZERO) <= 0) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            Validation.isStringConvertableToBigDecimal(rateParam);
+            BigDecimal newRate = new BigDecimal(rateParam);
+
+            if (Validation.isZeroOrNegative(newRate)) {
+                throw new IllegalArgumentException("Invalid rate value");
             }
 
             int baseCurrencyId = 0;
             int targetCurrencyId = 0;
-            try {
-                baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode).getId();
-                targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode).getId();
-            } catch (NullPointerException npe) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
+
+            baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode).getId();
+            targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode).getId();
+
 
             ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                throw new NullPointerException("Exchange rate not found");
             }
 
             ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate);
@@ -127,10 +120,15 @@ public class ExchangeRateServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-
+            System.out.println("CurrencyExchange rate updated:" + updated);
             PrintWriter out = response.getWriter();
             out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (NullPointerException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ServletException("Error updating exchange rate", e);
