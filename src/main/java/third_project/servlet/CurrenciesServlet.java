@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
+import third_project.service.Validation;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,20 +40,26 @@ public class CurrenciesServlet extends HttpServlet {
             String code = request.getParameter("code");
             String sign = request.getParameter("sign");
 
-            if (name == null || code == null || sign == null) {
+            if (!Validation.areThreeStringsValid(name, code, sign)) {
                 System.err.println("invalid parameters");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+                throw new IllegalArgumentException("Invalid parameters");
             }
             if (currenciesDbConnector.findByCode(code) != null) {
                 System.err.println("currency with such code already exists");
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                return;
+                throw new IllegalStateException("Currency with such code already exists");
             }
             Currency currency = currenciesDbConnector.insert(code, name, sign);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_CREATED);
+        } catch (IllegalArgumentException e) {
+            System.err.println("invalid parameters");
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (IllegalStateException e) {
+            System.err.println("currency with such code already exists");
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
             System.out.println("error by currencies servlet, cause: " + e.getMessage());
             e.printStackTrace();
@@ -67,10 +74,9 @@ public class CurrenciesServlet extends HttpServlet {
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
-            if (currencies == null || currencies.isEmpty()) {
+            if (!Validation.isListValid(currencies)) {
                 System.out.println("error by currencies servlet, cause: currencies list is null or empty");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                throw new IllegalStateException("currencies list is null or empty");
             }
 
             mapper.writeValue(response.getWriter(), currencies);

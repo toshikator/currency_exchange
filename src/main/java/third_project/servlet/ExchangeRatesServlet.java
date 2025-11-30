@@ -10,6 +10,7 @@ import third_project.dto.DTOExchangeRate;
 import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.ExchangeRate;
+import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -54,16 +55,23 @@ public class ExchangeRatesServlet extends HttpServlet {
                 result.setRate(exchangeRate.getRate());
                 return result;
             }).collect(Collectors.toList());
-            if (exchangeRates == null || exchangeRates.isEmpty()) {
+            if (!Validation.isListValid(exchangeRates)) {
                 System.err.println("empty dataset of DTOs");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                throw new IllegalStateException("empty dataset of DTOs");
             }
 
             mapper.writeValue(response.getWriter(), exchangeRates);
             response.setStatus(HttpServletResponse.SC_OK);
+        } catch (IllegalStateException e) {
+            System.err.println("empty dataset of DTOs");
+            response.getWriter().println("empty dataset of DTOs");
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
         } catch (Exception e) {
             System.err.println("servlet global error: " + e.getMessage());
+            e.printStackTrace();
+            response.getWriter().println("servlet global error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -78,44 +86,28 @@ public class ExchangeRatesServlet extends HttpServlet {
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             String rateParam = request.getParameter("rate");
 
-            if (baseCurrencyCode == null || targetCurrencyCode == null || rateParam == null
-                    || baseCurrencyCode.trim().isEmpty() || targetCurrencyCode.trim().isEmpty() || rateParam.trim().isEmpty()) {
-                System.err.println("invalid parameters");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            if (Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
+                throw new IllegalStateException("invalid parameters");
             }
 
             baseCurrencyCode = baseCurrencyCode.toUpperCase();
             targetCurrencyCode = targetCurrencyCode.toUpperCase();
 
             if (baseCurrencyCode.equals(targetCurrencyCode)) {
-                System.err.println("base and target currencies must be different");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+                throw new IllegalStateException("baseCurrencyCode and targetCurrencyCode must be different");
             }
 
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
 
-            if (baseCurrency == null || targetCurrency == null) {
-                System.err.println("invalid currency code");
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
+            if (!Validation.isCurrencyValid(baseCurrency) || !Validation.isCurrencyValid(targetCurrency)) {
+                throw new IllegalArgumentException("invalid currency ");
             }
 
             BigDecimal rate;
-            try {
-                rate = new BigDecimal(rateParam);
-            } catch (NumberFormatException nfe) {
-                System.err.println("rate must be a number");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-
-            if (rate.compareTo(BigDecimal.ZERO) <= 0) {
-                System.err.println("rate must be positive");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            rate = new BigDecimal(rateParam);
+            if (Validation.isZeroOrNegative(rate)) {
+                throw new NumberFormatException("rate must be positive");
             }
 
             ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
@@ -127,16 +119,32 @@ public class ExchangeRatesServlet extends HttpServlet {
 
             ExchangeRate created = exchangeRatesDbConnector.insert(baseCurrencyCode, targetCurrencyCode, rate);
             if (created == null) {
-                System.err.println("error while inserting exchange rate");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                throw new Exception("exchange rate not created");
             }
 
             DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency, targetCurrency, rate);
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), dto);
             response.setStatus(HttpServletResponse.SC_CREATED);
+        } catch (NumberFormatException nfe) {
+            System.err.println("rate must be a number");
+            response.getWriter().println("rate must be a number" + nfe.getMessage());
+            nfe.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            response.getWriter().println("invalid currency" + e.getMessage());
+            System.err.println("invalid currency code");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            System.err.println("invalid parameters");
+            response.getWriter().println("invalid parameters" + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("error by exchange rate servlet");
+            response.getWriter().println("error by exchange rate servlet" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

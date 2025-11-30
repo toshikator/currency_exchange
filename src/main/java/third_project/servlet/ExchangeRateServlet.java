@@ -90,7 +90,6 @@ public class ExchangeRateServlet extends HttpServlet {
 
             String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
             String targetCurrencyCode = pathInfo.substring(4, 7).toUpperCase();
-
             String rateParam = request.getParameter("rate");
             if (Validation.isStringValid(rateParam)) {
                 throw new IllegalArgumentException("Invalid rate parameter");
@@ -105,10 +104,8 @@ public class ExchangeRateServlet extends HttpServlet {
 
             int baseCurrencyId = 0;
             int targetCurrencyId = 0;
-
             baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode).getId();
             targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode).getId();
-
 
             ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
