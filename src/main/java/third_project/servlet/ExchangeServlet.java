@@ -20,6 +20,7 @@ import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @WebServlet(name = "exchange", value = "/exchange")
 public class ExchangeServlet extends HttpServlet {
@@ -59,20 +60,33 @@ public class ExchangeServlet extends HttpServlet {
                 throw new IllegalArgumentException("target currency not found");
             }
             ExchangeRate rate;
+            DTOExchange result;
             if (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode(to).getId()))) {
                 rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode(to).getId());
                 BigDecimal convertedAmount = amount.multiply(rate.getRate());
-                DTOExchange result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
+                result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
                 System.out.println(result);
                 response.getWriter().write(result.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
             } else if (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()))) {
                 rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId());
-                BigDecimal convertedAmount = amount.multiply(rate.getRate());
-                DTOExchange result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
+                BigDecimal convertedAmount = amount.multiply(new BigDecimal(1).divide(rate.getRate(), 6, RoundingMode.HALF_UP));
+                result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
                 System.out.println(result);
                 response.getWriter().write(result.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
+            } else if (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId())) &&
+                    (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId())))) {
+                ExchangeRate firstRate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId());
+                ExchangeRate secondRate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId());
+                BigDecimal convertedAmount = amount.multiply(firstRate.getRate()).divide(secondRate.getRate(), 6, RoundingMode.HALF_UP);
+                result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
+                System.out.println(result);
+                response.getWriter().write(result.toString());
+                response.setStatus(HttpServletResponse.SC_OK);
+
+            } else {
+                throw new Exception("no currency exchange rate");
             }
 
 
@@ -90,14 +104,14 @@ public class ExchangeServlet extends HttpServlet {
 //            }
 
 
-            rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId());
-            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()) == null) {
-                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(reverse course)");
-            }
-            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId()) == null
-                    && ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId()) == null) {
-                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(cross USD course)");
-            }
+//            rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId());
+//            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()) == null) {
+//                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(reverse course)");
+//            }
+//            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId()) == null
+//                    && ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId()) == null) {
+//                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(cross USD course)");
+//            }
 
 
         } catch (Exception e) {

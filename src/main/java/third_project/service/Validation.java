@@ -13,9 +13,9 @@ import java.util.List;
 
 public final class Validation {
 
-    private static CurrenciesDbConnector currenciesDbConnector;
+    private static final CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
 
-    private static ExchangeRatesDbConnector exchangeRatesDbConnector;
+    private static final ExchangeRatesDbConnector exchangeRatesDbConnector = new ExchangeRatesDbConnector();
 
     public static boolean isStringValid(String str) {
         return str != null && !str.isEmpty();
