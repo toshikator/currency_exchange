@@ -10,6 +10,11 @@
     <name>currency_exchange</name>
     <packaging>war</packaging>
 
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+    </properties>
+
 
     <dependencies>
         <dependency>

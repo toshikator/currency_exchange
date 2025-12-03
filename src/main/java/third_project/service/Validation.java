@@ -22,6 +22,7 @@ public final class Validation {
     }
 
     public static boolean isStringConvertableToBigDecimal(String str) throws IllegalArgumentException {
+        System.out.println("string on validation" + " " + str);
         try {
             BigDecimal bd = new BigDecimal(str);
             return true;

@@ -9,5 +9,6 @@
         <module name="currency_exchange" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="25" />
   </component>
 </project>

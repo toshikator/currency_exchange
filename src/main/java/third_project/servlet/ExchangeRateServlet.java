@@ -1,5 +1,6 @@
 package third_project.servlet;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,8 @@ import third_project.service.Validation;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @WebServlet(name = "exchangerate", value = "/exchangerate/*")
@@ -77,25 +80,34 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("doPatch called");
-        System.err.println("do patch called");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String pathInfo = request.getPathInfo();
+            String pathInfo = request.getPathInfo().toUpperCase();
             System.out.println("pathInfo: " + pathInfo);
             if (!Validation.isPatchRequestValid(pathInfo)) {
                 throw new IllegalArgumentException("Invalid pathInfo");
             }
 
             String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
-            String targetCurrencyCode = pathInfo.substring(4, 7).toUpperCase();
+            String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
+            System.out.println("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode);
+
+
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> rates = new HashMap<>();
+            mapper.readValues((HashMap<String, String>) rates, String.class);
+            rates.forEach((key, value) -> System.out.println(key + " -> " + value));
+
             String rateParam = request.getParameter("rate");
+            System.out.println("rateParam: " + rateParam);
             if (Validation.isStringValid(rateParam)) {
+                System.err.println("String is invalid");
                 throw new IllegalArgumentException("Invalid rate parameter");
             }
 
             Validation.isStringConvertableToBigDecimal(rateParam);
+            System.out.println("rateParam: " + rateParam);
             BigDecimal newRate = new BigDecimal(rateParam);
 
             if (Validation.isZeroOrNegative(newRate)) {
@@ -122,11 +134,17 @@ public class ExchangeRateServlet extends HttpServlet {
             out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (NullPointerException e) {
+            System.err.println(e.getMessage());
+            response.getWriter().println(e.getMessage() + " Null pointer exception");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         } catch (Exception e) {
+            System.err.println(e.getMessage());
+            response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ServletException("Error updating exchange rate", e);
         }
