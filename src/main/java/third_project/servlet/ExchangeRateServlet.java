@@ -93,15 +93,20 @@ public class ExchangeRateServlet extends HttpServlet {
             String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
             System.out.println("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode);
 
-
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> rates = new HashMap<>();
-            mapper.readValues((HashMap<String, String>) rates, String.class);
-            rates.forEach((key, value) -> System.out.println(key + " -> " + value));
+            third_project.service.PatchBodyParser.ParsedBody parsedBody = third_project.service.PatchBodyParser.parse(request);
 
             String rateParam = request.getParameter("rate");
+            if (rateParam == null || rateParam.isBlank()) {
+                rateParam = parsedBody.getFirst("rate"); // x-www-form-urlencoded
+            }
+            if (rateParam == null || rateParam.isBlank()) {
+                Object jsonRate = parsedBody.json().get("rate"); // application/json
+                if (jsonRate != null) {
+                    rateParam = String.valueOf(jsonRate);
+                }
+            }
             System.out.println("rateParam: " + rateParam);
-            if (Validation.isStringValid(rateParam)) {
+            if (!Validation.isStringValid(rateParam)) {
                 System.err.println("String is invalid");
                 throw new IllegalArgumentException("Invalid rate parameter");
             }
