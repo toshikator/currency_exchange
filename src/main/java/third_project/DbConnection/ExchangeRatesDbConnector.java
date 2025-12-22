@@ -49,8 +49,7 @@ public class ExchangeRatesDbConnector {
             targetCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.targetCurrencyId"));
             rateColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.rate"));
 
-            // Construct Oracle JDBC URL by default using address and databaseName from config
-            String url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
+                        String url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
         } catch (Exception e) {
             System.out.println("Failed to load database configuration for ExchangeRatesDB");
             System.err.println(e);
@@ -62,7 +61,7 @@ public class ExchangeRatesDbConnector {
     public static ExchangeRate findRate(int baseCurrencyId, int targetCurrencyId) {
         if (baseCurrencyId == 0 || targetCurrencyId == 0) return null;
 
-        if (baseCurrencyId == targetCurrencyId) return null; // trivial case
+        if (baseCurrencyId == targetCurrencyId) return null;
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();

@@ -86,7 +86,7 @@ public class ExchangeServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_OK);
 
             } else {
-                throw new Exception("no currency exchange rate");
+                throw new Exception("Exchange servlet: no currency exchange rate");
             }
 
 
@@ -115,7 +115,7 @@ public class ExchangeServlet extends HttpServlet {
 
 
         } catch (Exception e) {
-            System.out.println("Exception in doGet");
+            System.out.println("Exchange servlet: Exception in doGet");
             System.err.println(e);
             response.getWriter().write("currency did not found" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.Properties;
 
 public final class HikariPool {
@@ -16,11 +17,17 @@ public final class HikariPool {
 
     private HikariPool() {
         try {
+            System.out.println("Initializing HikariCP pool...");
             Properties props = new Properties();
             try (java.io.InputStream in = HikariPool.class.getClassLoader().getResourceAsStream("configs/connectivity.properties")) {
                 if (in != null) {
                     props.load(in);
+                    System.out.println("HikariCP pool initialized successfully");
                 }
+            } catch (IOException e) {
+                System.out.println("Failed to load database configuration for HikariCP");
+                System.err.println(e.getMessage());
+                throw new RuntimeException(e);
             }
             String address = props.getProperty("address");
             String port = props.getProperty("port");
@@ -72,6 +79,11 @@ public final class HikariPool {
                 }
             }
         }
+        System.out.println("Hikari pool data");
+        System.out.println("Address: " + local.url);
+        System.out.println("Username: " + local.username);
+        System.out.println("Password: " + local.password);
+        System.out.println(local.ds.toString());
         return local.ds;
     }
 
