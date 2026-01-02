@@ -14,7 +14,9 @@ import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
@@ -22,7 +24,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
-
+    private static final Logger log = Logger.getLogger("com.example");
     public ExchangeRatesServlet() {
         super();
     }
@@ -38,6 +40,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         if (exchangeRatesDbConnector == null) {
             throw new jakarta.servlet.ServletException("exchangeRatesDbConnector not found in ServletContext");
         }
+log.info("ExchangeRatesServlet init");
     }
 
     @Override
@@ -45,6 +48,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        log.info("ExchangeRatesServlet doGet query: " + request.getQueryString());
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
@@ -81,12 +85,15 @@ public class ExchangeRatesServlet extends HttpServlet {
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        log.info("ExchangeRatesServlet doPost: "+request.getParameterMap().entrySet().toString());
+//        log.info("ExchangeRatesServlet doPOST query: " + request.getQueryString());
         try {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             String rateParam = request.getParameter("rate");
+            log.info("ExchangeRatesServlet doPost parameters: "+Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
 
-            if (Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
+            if (!Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
                 throw new IllegalStateException("invalid parameters");
             }
 
@@ -130,20 +137,24 @@ public class ExchangeRatesServlet extends HttpServlet {
             System.err.println("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());
             nfe.printStackTrace();
+            log.info("ExchangeRatesServlet NumberFormatException exception: "+nfe.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             response.getWriter().println("invalid currency" + e.getMessage());
             System.err.println("invalid currency code");
+            log.info("ExchangeRatesServlet IllegalArgumentException exception: "+e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             System.err.println("invalid parameters");
+            log.info("ExchangeRatesServlet IllegalStateException exception: "+e.getMessage());
             response.getWriter().println("invalid parameters" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("error by exchange rate servlet");
+            log.info("ExchangeRatesServlet General exception: "+e.getMessage());
             response.getWriter().println("error by exchange rate servlet" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
