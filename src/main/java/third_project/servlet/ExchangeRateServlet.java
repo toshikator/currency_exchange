@@ -20,12 +20,14 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 @WebServlet(name = "exchangerate", value = "/exchangerate/*")
 public class ExchangeRateServlet extends HttpServlet {
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
+    private static final Logger log = Logger.getLogger("com.example");
 
     public ExchangeRateServlet() {
         super();
@@ -34,6 +36,7 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        log.info("ExchangeRateServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null)
             throw new ServletException("currenciesDbConnector not found in ServletContext");
@@ -69,8 +72,11 @@ public class ExchangeRateServlet extends HttpServlet {
             response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate())));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
+            log.info("ExchangeRate servlet NullPointerException(doGET_1): " + e.getMessage());
+
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
+            log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             System.out.println("loloL " + e);
             throw new ServletException("Error processing exchange rate request", e);
@@ -140,15 +146,18 @@ public class ExchangeRateServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
+            log.info("ExchangeRate servlet IllegalArgumentException(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (NullPointerException e) {
             System.err.println(e.getMessage());
+            log.info("ExchangeRate servlet NullPointerException(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage() + " Null pointer exception");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            log.info("ExchangeRate servlet unexpected Exception(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ServletException("Error updating exchange rate", e);

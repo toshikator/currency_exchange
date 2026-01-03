@@ -13,11 +13,12 @@ import third_project.service.Validation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private CurrenciesDbConnector currenciesDbConnector;
-
+    private static final Logger log = Logger.getLogger("com.example");
     public CurrenciesServlet() {
         super();
     }
@@ -25,6 +26,7 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        log.info("CurrenciesServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null) {
             throw new ServletException("currenciesDbConnector not found in ServletContext");
@@ -54,15 +56,18 @@ public class CurrenciesServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (IllegalArgumentException e) {
             System.err.println("invalid parameters");
+            log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
             System.err.println("currency with such code already exists");
+            log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
             System.out.println("error by currencies servlet, cause: " + e.getMessage());
             e.printStackTrace();
+            log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -84,6 +89,7 @@ public class CurrenciesServlet extends HttpServlet {
         } catch (Exception e) {
             System.out.println("error by currencies servlet, cause: " + e.getMessage());
             e.printStackTrace();
+            log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

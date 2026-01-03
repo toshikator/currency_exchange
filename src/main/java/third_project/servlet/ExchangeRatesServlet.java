@@ -32,6 +32,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     public void init() throws jakarta.servlet.ServletException {
         super.init();
+        log.info("ExchangeRatesServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null) {
             throw new jakarta.servlet.ServletException("currenciesDbConnector not found in ServletContext");
@@ -40,7 +41,6 @@ public class ExchangeRatesServlet extends HttpServlet {
         if (exchangeRatesDbConnector == null) {
             throw new jakarta.servlet.ServletException("exchangeRatesDbConnector not found in ServletContext");
         }
-log.info("ExchangeRatesServlet init");
     }
 
     @Override
@@ -48,7 +48,7 @@ log.info("ExchangeRatesServlet init");
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        log.info("ExchangeRatesServlet doGet query: " + request.getQueryString());
+        log.info("ExchangeRatesServlet doGet parameters: " + request.getPathInfo());
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
@@ -67,12 +67,14 @@ log.info("ExchangeRatesServlet init");
             mapper.writeValue(response.getWriter(), exchangeRates);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalStateException e) {
+            log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: "+e.getMessage());
             System.err.println("empty dataset of DTOs");
             response.getWriter().println("empty dataset of DTOs");
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
+            log.info("ExchangeRatesServlet (doGet): servlet global error: "+e.getMessage());
             System.err.println("servlet global error: " + e.getMessage());
             e.printStackTrace();
             response.getWriter().println("servlet global error: " + e.getMessage());
@@ -85,8 +87,6 @@ log.info("ExchangeRatesServlet init");
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        log.info("ExchangeRatesServlet doPost: "+request.getParameterMap().entrySet().toString());
-//        log.info("ExchangeRatesServlet doPOST query: " + request.getQueryString());
         try {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
@@ -137,24 +137,24 @@ log.info("ExchangeRatesServlet init");
             System.err.println("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());
             nfe.printStackTrace();
-            log.info("ExchangeRatesServlet NumberFormatException exception: "+nfe.getMessage());
+            log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): "+nfe.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             response.getWriter().println("invalid currency" + e.getMessage());
             System.err.println("invalid currency code");
-            log.info("ExchangeRatesServlet IllegalArgumentException exception: "+e.getMessage());
+            log.info("ExchangeRatesServlet IllegalArgumentException exception(doPOST): "+e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             System.err.println("invalid parameters");
-            log.info("ExchangeRatesServlet IllegalStateException exception: "+e.getMessage());
+            log.info("ExchangeRatesServlet IllegalStateException exception(doPOST): "+e.getMessage());
             response.getWriter().println("invalid parameters" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("error by exchange rate servlet");
-            log.info("ExchangeRatesServlet General exception: "+e.getMessage());
+            log.info("ExchangeRatesServlet General exception(doPOST): "+e.getMessage());
             response.getWriter().println("error by exchange rate servlet" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

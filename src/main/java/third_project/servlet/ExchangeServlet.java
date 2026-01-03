@@ -21,11 +21,13 @@ import third_project.service.Validation;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.logging.Logger;
 
 @WebServlet(name = "exchange", value = "/exchange")
 public class ExchangeServlet extends HttpServlet {
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
+    private static final Logger log = Logger.getLogger("com.example");
 
     public ExchangeServlet() {
         super();
@@ -34,6 +36,7 @@ public class ExchangeServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        log.info("ExchangeServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null)
             throw new ServletException("currenciesDbConnector not found in ServletContext");
@@ -47,6 +50,7 @@ public class ExchangeServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
         try {
             String from = request.getParameter("from");
             String to = request.getParameter("to");
@@ -115,6 +119,7 @@ public class ExchangeServlet extends HttpServlet {
 
 
         } catch (Exception e) {
+            log.info("ExchangeServlet Exception(doGET) :"+e.getMessage());
             System.out.println("Exchange servlet: Exception in doGet");
             System.err.println(e);
             response.getWriter().write("currency did not found" + e.getMessage());

@@ -12,6 +12,7 @@ import third_project.service.Validation;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 @WebServlet(name = "currency", value = "/currency/*")
 public class CurrencyServlet extends HttpServlet {
@@ -19,6 +20,7 @@ public class CurrencyServlet extends HttpServlet {
     private Validation validator;
     private DataSource ds;
 
+    private static final Logger log = Logger.getLogger("com.example");
     public CurrencyServlet() {
         super();
     }
@@ -26,6 +28,7 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        log.info("CurrencyServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null)
             throw new ServletException("currenciesDbConnector not found in ServletContext");
@@ -55,13 +58,16 @@ public class CurrencyServlet extends HttpServlet {
 
         } catch (IllegalArgumentException e) {
             System.err.println("invalid pathInfo");
+            log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (ServletException e) {
             e.printStackTrace();
+            log.info("Currency servlet ServletException(Currency not found): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
+            log.info("Currency servlet unexpected Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
