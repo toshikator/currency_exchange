@@ -127,7 +127,7 @@ public class ExchangeServlet extends HttpServlet {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage());
             System.out.println("Exchange servlet: Exception in doGet");
             System.err.println(e);
-            response.getWriter().write("currency did not found" + e.getMessage());
+            response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
