@@ -1,5 +1,6 @@
 package third_project.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,11 +17,11 @@ import java.util.logging.Logger;
 
 @WebServlet(name = "currency", value = "/currency/*")
 public class CurrencyServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger("com.example");
     private CurrenciesDbConnector currenciesDbConnector;
     private Validation validator;
     private DataSource ds;
 
-    private static final Logger log = Logger.getLogger("com.example");
     public CurrencyServlet() {
         super();
     }
@@ -53,7 +54,8 @@ public class CurrencyServlet extends HttpServlet {
                 throw new ServletException("Currency not found");
             }
             PrintWriter out = response.getWriter();
-            out.println(currency);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_OK);
 
         } catch (IllegalArgumentException e) {

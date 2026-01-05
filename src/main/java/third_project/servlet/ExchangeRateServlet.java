@@ -65,11 +65,15 @@ public class ExchangeRateServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            PrintWriter out = response.getWriter();
+//            PrintWriter out = response.getWriter();
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
-            out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
+
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.writeValue(response.getWriter(), currency);
+
+//            out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
             response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
@@ -145,8 +149,7 @@ public class ExchangeRateServlet extends HttpServlet {
             }
             log.info("ExchangeRate updated:" + updated);
             System.out.println("CurrencyExchange rate updated:" + updated);
-            PrintWriter out = response.getWriter();
-            out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP)));
+            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
