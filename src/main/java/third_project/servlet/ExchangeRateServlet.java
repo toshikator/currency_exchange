@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 
-@WebServlet(name = "exchangerate", value = "/exchangerate/*")
+@WebServlet(name = "exchangeRate", value = "/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
@@ -88,9 +88,11 @@ public class ExchangeRateServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        log.info("ExchangeRate servlet doPATCH");
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
             System.out.println("pathInfo: " + pathInfo);
+
             if (!Validation.isPatchRequestValid(pathInfo)) {
                 throw new IllegalArgumentException("Invalid pathInfo");
             }
@@ -140,6 +142,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
+            log.info("ExchangeRate updated:" + updated);
             System.out.println("CurrencyExchange rate updated:" + updated);
             PrintWriter out = response.getWriter();
             out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate()));

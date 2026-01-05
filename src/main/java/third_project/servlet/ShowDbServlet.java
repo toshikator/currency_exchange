@@ -41,11 +41,11 @@ public class ShowDbServlet extends HttpServlet {
             response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
             PrintWriter out = response.getWriter();
             out.println("<html><body>");
-            out.println("<h2><a href='index.jsp'>Home</a></h2>");
+            out.println("<h2><a href='index.html'>Home</a></h2>");
             for (Currency currency : currencies) {
                 out.println("<div>" + currency.toString() + "</div>");
             }
-            out.println("<h2><a href='index.jsp'>Home</a></h2>");
+            out.println("<h2><a href='index.html'>Home</a></h2>");
             out.println("</body></html>");
         } catch (Exception e) {
             response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

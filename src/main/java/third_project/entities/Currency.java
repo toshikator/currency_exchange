@@ -25,7 +25,7 @@ public class Currency implements Serializable {
         return "{" +
                 "id=" + id +
                 ", code='" + code + '\'' +
-                ", fullName='" + fullName + '\'' +
+                ", name='" + fullName + '\'' +
                 ", sign='" + sign + '\'' +
                 '}';
     }

@@ -1,7 +1,8 @@
 $(document).ready(function () {
     
-    const host = "http://bukhman.pro"
+    // const host = "http://bukhman.pro"
 
+    const host = window.location.origin;
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
         $.ajax({
