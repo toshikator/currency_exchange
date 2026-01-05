@@ -17,8 +17,9 @@ import java.util.logging.Logger;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private CurrenciesDbConnector currenciesDbConnector;
     private static final Logger log = Logger.getLogger("com.example");
+    private CurrenciesDbConnector currenciesDbConnector;
+
     public CurrenciesServlet() {
         super();
     }

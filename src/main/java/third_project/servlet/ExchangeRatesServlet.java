@@ -14,6 +14,7 @@ import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,9 +23,10 @@ import java.util.stream.Collectors;
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private static final Logger log = Logger.getLogger("com.example");
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
-    private static final Logger log = Logger.getLogger("com.example");
+
     public ExchangeRatesServlet() {
         super();
     }
@@ -56,7 +58,7 @@ public class ExchangeRatesServlet extends HttpServlet {
                 result.setId(exchangeRate.getId());
                 result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId()));
                 result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId()));
-                result.setRate(exchangeRate.getRate());
+                result.setRate(exchangeRate.getRate().setScale(2, RoundingMode.HALF_UP));
                 return result;
             }).collect(Collectors.toList());
             if (!Validation.isListValid(exchangeRates)) {
@@ -67,14 +69,14 @@ public class ExchangeRatesServlet extends HttpServlet {
             mapper.writeValue(response.getWriter(), exchangeRates);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalStateException e) {
-            log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: "+e.getMessage());
+            log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage());
             System.err.println("empty dataset of DTOs");
             response.getWriter().println("empty dataset of DTOs");
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
-            log.info("ExchangeRatesServlet (doGet): servlet global error: "+e.getMessage());
+            log.info("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage());
             System.err.println("servlet global error: " + e.getMessage());
             e.printStackTrace();
             response.getWriter().println("servlet global error: " + e.getMessage());
@@ -91,7 +93,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             String rateParam = request.getParameter("rate");
-            log.info("ExchangeRatesServlet doPost parameters: "+Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
+            log.info("ExchangeRatesServlet doPost parameters: " + Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
 
             if (!Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
                 throw new IllegalStateException("invalid parameters");
@@ -137,24 +139,24 @@ public class ExchangeRatesServlet extends HttpServlet {
             System.err.println("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());
             nfe.printStackTrace();
-            log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): "+nfe.getMessage());
+            log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): " + nfe.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             response.getWriter().println("invalid currency" + e.getMessage());
             System.err.println("invalid currency code");
-            log.info("ExchangeRatesServlet IllegalArgumentException exception(doPOST): "+e.getMessage());
+            log.info("ExchangeRatesServlet IllegalArgumentException exception(doPOST): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             System.err.println("invalid parameters");
-            log.info("ExchangeRatesServlet IllegalStateException exception(doPOST): "+e.getMessage());
+            log.info("ExchangeRatesServlet IllegalStateException exception(doPOST): " + e.getMessage());
             response.getWriter().println("invalid parameters" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("error by exchange rate servlet");
-            log.info("ExchangeRatesServlet General exception(doPOST): "+e.getMessage());
+            log.info("ExchangeRatesServlet General exception(doPOST): " + e.getMessage());
             response.getWriter().println("error by exchange rate servlet" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

@@ -18,6 +18,7 @@ import third_project.service.Validation;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -25,9 +26,9 @@ import java.util.logging.Logger;
 
 @WebServlet(name = "exchangeRate", value = "/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger("com.example");
     private CurrenciesDbConnector currenciesDbConnector;
     private ExchangeRatesDbConnector exchangeRatesDbConnector;
-    private static final Logger log = Logger.getLogger("com.example");
 
     public ExchangeRateServlet() {
         super();
@@ -69,7 +70,7 @@ public class ExchangeRateServlet extends HttpServlet {
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
-            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate())));
+            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
             log.info("ExchangeRate servlet NullPointerException(doGET_1): " + e.getMessage());
@@ -145,7 +146,7 @@ public class ExchangeRateServlet extends HttpServlet {
             log.info("ExchangeRate updated:" + updated);
             System.out.println("CurrencyExchange rate updated:" + updated);
             PrintWriter out = response.getWriter();
-            out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate()));
+            out.println(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP)));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
