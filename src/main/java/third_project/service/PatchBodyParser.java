@@ -16,12 +16,8 @@ public final class PatchBodyParser {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private PatchBodyParser() {
-        // utility class
     }
 
-    /**
-     * Main entry point — detects content type automatically.
-     */
     public static ParsedBody parse(HttpServletRequest request) throws IOException {
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         String body = readBody(request);

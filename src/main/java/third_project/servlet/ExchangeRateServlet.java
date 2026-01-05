@@ -65,15 +65,10 @@ public class ExchangeRateServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-//            PrintWriter out = response.getWriter();
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
 
-//            ObjectMapper mapper = new ObjectMapper();
-//            mapper.writeValue(response.getWriter(), currency);
-
-//            out.println(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate()));
             response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (NullPointerException e) {
@@ -110,10 +105,10 @@ public class ExchangeRateServlet extends HttpServlet {
 
             String rateParam = request.getParameter("rate");
             if (rateParam == null || rateParam.isBlank()) {
-                rateParam = parsedBody.getFirst("rate"); // x-www-form-urlencoded
+                rateParam = parsedBody.getFirst("rate");
             }
             if (rateParam == null || rateParam.isBlank()) {
-                Object jsonRate = parsedBody.json().get("rate"); // application/json
+                Object jsonRate = parsedBody.json().get("rate");
                 if (jsonRate != null) {
                     rateParam = String.valueOf(jsonRate);
                 }

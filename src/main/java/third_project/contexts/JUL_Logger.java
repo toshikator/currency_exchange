@@ -16,7 +16,6 @@ public class JUL_Logger implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            // Put logs under: <tomcat>/logs/<your-app-name>/
             String catalinaBase = System.getProperty("catalina.base");
             String appName = sce.getServletContext().getContextPath();
             if (appName == null || appName.isBlank() || "/".equals(appName)) appName = "ROOT";
@@ -27,14 +26,10 @@ public class JUL_Logger implements ServletContextListener {
                 throw new IOException("Cannot create log directory: " + logDir.getAbsolutePath());
             }
 
-            // Create/append to file
             File logFile = new File(logDir, "app.log");
 
-            // Configure a dedicated app logger (avoid messing with global root logger too much)
-            Logger appLogger = Logger.getLogger("com.example"); // use your base package
-            appLogger.setUseParentHandlers(false); // prevent double logging to console
-
-            // Avoid adding multiple handlers on redeploy
+            Logger appLogger = Logger.getLogger("com.example");
+            appLogger.setUseParentHandlers(false);
             for (Handler h : appLogger.getHandlers()) {
                 appLogger.removeHandler(h);
                 try { h.close(); } catch (Exception ignored) {}
@@ -50,7 +45,6 @@ public class JUL_Logger implements ServletContextListener {
             appLogger.info("JUL logging initialized. Log file: " + logFile.getAbsolutePath());
 
         } catch (Exception e) {
-            // If logging isn't ready, at least print to stderr
             System.err.println("Failed to init JUL logging: " + e.getMessage());
             e.printStackTrace(System.err);
         }

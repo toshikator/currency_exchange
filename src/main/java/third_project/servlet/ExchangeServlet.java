@@ -50,7 +50,6 @@ public class ExchangeServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-//        log.info("DOGET request ExchangeServlet doGET");
         try {
             String from = request.getParameter("from");
             String to = request.getParameter("to");
@@ -97,30 +96,6 @@ public class ExchangeServlet extends HttpServlet {
             } else {
                 throw new Exception("Exchange servlet: no currency exchange rate");
             }
-
-
-//            ExchangeRate rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode(to).getId());
-//            if (rate == null) {
-//                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(straight course)");
-//                System.out.println("error on convertation");
-//                System.out.println("no currency exchange rate");
-//            } else {
-//                BigDecimal convertedAmount = amount.multiply(rate.getRate());
-//                DTOExchange result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
-//                System.out.println(result);
-//                response.getWriter().write(result.toString());
-//                response.setStatus(HttpServletResponse.SC_OK);
-//            }
-
-
-//            rate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId());
-//            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()) == null) {
-//                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(reverse course)");
-//            }
-//            if (ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId()) == null
-//                    && ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId()) == null) {
-//                errMsg.append("Exchange rate for ").append(from).append(" to ").append(to).append(" not found(cross USD course)");
-//            }
 
 
         } catch (Exception e) {

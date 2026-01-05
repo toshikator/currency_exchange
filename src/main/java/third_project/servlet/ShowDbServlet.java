@@ -56,7 +56,6 @@ public class ShowDbServlet extends HttpServlet {
                 out.println("<p>" + e.getMessage() + "</p>");
                 out.println("</body></html>");
             } catch (IllegalStateException ignored) {
-                // response might be already committed
             }
         }
     }

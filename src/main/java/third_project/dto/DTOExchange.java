@@ -33,16 +33,6 @@ public class DTOExchange {
     }
 
     @Override
-//    public String toString() {
-//        return "{" +
-//                "amount=" + amount +
-//                ", convertedAmount=" + convertedAmount +
-//                ", baseCurrency=" + baseCurrency +
-//                ", targetCurrency=" + targetCurrency +
-//                ", rate=" + rate +
-//                "}";
-//    }
-
     public String toString() {
 
         Jsonb jsonb = JsonbBuilder.create();

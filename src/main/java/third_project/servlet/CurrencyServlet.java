@@ -35,7 +35,6 @@ public class CurrencyServlet extends HttpServlet {
             throw new ServletException("currenciesDbConnector not found in ServletContext");
 
         ds = (DataSource) getServletContext().getAttribute("datasource");
-        // ds may be optional for this servlet; don't fail deployment if it's not required here
     }
 
     @Override

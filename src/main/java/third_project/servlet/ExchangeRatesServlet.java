@@ -50,7 +50,6 @@ public class ExchangeRatesServlet extends HttpServlet {
             throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-//        log.info("ExchangeRatesServlet doGet parameters: " + request.getPathInfo());
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
