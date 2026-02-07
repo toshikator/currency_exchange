@@ -25,26 +25,13 @@ import java.util.logging.Logger;
 
 
 @WebServlet(name = "exchangeRate", value = "/exchangeRate/*")
-public class ExchangeRateServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger("com.example");
-    private CurrenciesDbConnector currenciesDbConnector;
-    private ExchangeRatesDbConnector exchangeRatesDbConnector;
+public class ExchangeRateServlet extends BaseServlet {
+
 
     public ExchangeRateServlet() {
         super();
     }
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        log.info("ExchangeRateServlet init");
-        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null)
-            throw new ServletException("currenciesDbConnector not found in ServletContext");
-        exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
-        if (exchangeRatesDbConnector == null)
-            throw new ServletException("exchangeRatesDbConnector not found in ServletContext");
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

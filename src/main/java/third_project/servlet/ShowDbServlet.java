@@ -11,22 +11,12 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet(name = "showDbServlet", value = "/show-db")
-public class ShowDbServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private CurrenciesDbConnector currenciesDbConnector;
+public class ShowDbServlet extends BaseServlet {
 
     public ShowDbServlet() {
         super();
     }
 
-    @Override
-    public void init() throws jakarta.servlet.ServletException {
-        super.init();
-        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null) {
-            throw new jakarta.servlet.ServletException("currenciesDbConnector not found in ServletContext");
-        }
-    }
 
     public void doGet(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws IOException {
         response.setContentType("text/html");

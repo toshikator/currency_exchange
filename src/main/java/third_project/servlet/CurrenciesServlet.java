@@ -16,23 +16,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @WebServlet(name = "currenciesList", value = "/currencies")
-public class CurrenciesServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger("com.example");
-    private CurrenciesDbConnector currenciesDbConnector;
+public class CurrenciesServlet extends BaseServlet {
 
     public CurrenciesServlet() {
         super();
     }
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        log.info("CurrenciesServlet init");
-        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null) {
-            throw new ServletException("currenciesDbConnector not found in ServletContext");
-        }
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

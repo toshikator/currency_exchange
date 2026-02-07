@@ -16,26 +16,13 @@ import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 @WebServlet(name = "currency", value = "/currency/*")
-public class CurrencyServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger("com.example");
-    private CurrenciesDbConnector currenciesDbConnector;
-    private Validation validator;
-    private DataSource ds;
+public class CurrencyServlet extends BaseServlet {
+    
 
     public CurrencyServlet() {
         super();
     }
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        log.info("CurrencyServlet init");
-        currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null)
-            throw new ServletException("currenciesDbConnector not found in ServletContext");
-
-        ds = (DataSource) getServletContext().getAttribute("datasource");
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
