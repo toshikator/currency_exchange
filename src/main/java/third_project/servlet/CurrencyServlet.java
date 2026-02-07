@@ -45,7 +45,7 @@ public class CurrencyServlet extends BaseServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
         } catch (IllegalArgumentException e) {
-            System.err.println("invalid pathInfo");
+            log.info("invalid pathInfo");
             log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

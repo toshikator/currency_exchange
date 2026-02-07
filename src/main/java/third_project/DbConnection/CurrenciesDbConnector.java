@@ -10,9 +10,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
 
 public class CurrenciesDbConnector {
+
+    private static final Logger log = Logger.getLogger("com.example");
 
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
     private final DataSource ds;
@@ -44,8 +47,8 @@ public class CurrenciesDbConnector {
 
 
         } catch (Exception ex) {
-            System.out.println("Exception in CurrenciesDbConnection constructor");
-            System.out.println(ex);
+            log.info("Exception in CurrenciesDbConnection constructor");
+            log.info(String.valueOf(ex));
         }
         this.ds = HikariPool.get();
     }
@@ -66,8 +69,8 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("insert exception: " + ex);
-            System.out.println(ex);
+            log.info("insert exception: " + ex);
+            log.info(String.valueOf(ex));
         }
         return null;
     }
@@ -89,8 +92,8 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("update exception: " + ex);
-            System.out.println(ex);
+            log.info("update exception: " + ex);
+            log.info(String.valueOf(ex));
         }
         return 0;
     }
@@ -109,8 +112,8 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("delete exception: " + ex);
-            System.out.println(ex);
+            log.info("delete exception: " + ex);
+            log.info(String.valueOf(ex));
         }
         return 0;
     }
@@ -134,9 +137,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Exception in selectOne by Currency Code");
-            System.out.println("Currency code = " + code);
-            System.out.println(ex);
+            log.info("Exception in selectOne by Currency Code");
+            log.info("Currency code = " + code);
+            log.info(String.valueOf(ex));
             throw new SQLException("Currency not found in the database");
         }
         return currency;
@@ -161,9 +164,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Exception in findById");
-            System.out.println("Currency id = " + id);
-            System.out.println(ex);
+            log.info("Exception in findById");
+            log.info("Currency id = " + id);
+            log.info(String.valueOf(ex));
         }
         return currency;
     }
@@ -189,7 +192,7 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex);
+            log.info(String.valueOf(ex));
         }
         return currencies;
     }

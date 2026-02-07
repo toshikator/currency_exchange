@@ -65,7 +65,7 @@ public class ExchangeRateServlet extends BaseServlet {
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            System.out.println("loloL " + e);
+            log.info("loloL " + e);
             throw new ServletException("Error processing exchange rate request", e);
         }
     }
@@ -78,7 +78,7 @@ public class ExchangeRateServlet extends BaseServlet {
         log.info("ExchangeRate servlet doPATCH");
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
-            System.out.println("pathInfo: " + pathInfo);
+            log.info("pathInfo: " + pathInfo);
 
             if (!Validation.isPatchRequestValid(pathInfo)) {
                 throw new IllegalArgumentException("Invalid pathInfo");
@@ -86,7 +86,7 @@ public class ExchangeRateServlet extends BaseServlet {
 
             String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
             String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
-            System.out.println("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode);
+            log.info("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode);
 
             third_project.service.PatchBodyParser.ParsedBody parsedBody = third_project.service.PatchBodyParser.parse(request);
 
@@ -100,14 +100,14 @@ public class ExchangeRateServlet extends BaseServlet {
                     rateParam = String.valueOf(jsonRate);
                 }
             }
-            System.out.println("rateParam: " + rateParam);
+            log.info("rateParam: " + rateParam);
             if (!Validation.isStringValid(rateParam)) {
-                System.err.println("String is invalid");
+                log.info("String is invalid");
                 throw new IllegalArgumentException("Invalid rate parameter");
             }
 
             Validation.isStringConvertableToBigDecimal(rateParam);
-            System.out.println("rateParam: " + rateParam);
+            log.info("rateParam: " + rateParam);
             BigDecimal newRate = new BigDecimal(rateParam);
 
             if (Validation.isZeroOrNegative(newRate)) {
@@ -130,22 +130,22 @@ public class ExchangeRateServlet extends BaseServlet {
                 return;
             }
             log.info("ExchangeRate updated:" + updated);
-            System.out.println("CurrencyExchange rate updated:" + updated);
+            log.info("CurrencyExchange rate updated:" + updated);
             response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
+            log.info(e.getMessage());
             log.info("ExchangeRate servlet IllegalArgumentException(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (NullPointerException e) {
-            System.err.println(e.getMessage());
+            log.info(e.getMessage());
             log.info("ExchangeRate servlet NullPointerException(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage() + " Null pointer exception");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            log.info(e.getMessage());
             log.info("ExchangeRate servlet unexpected Exception(doPATCH): " + e.getMessage());
             response.getWriter().println(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

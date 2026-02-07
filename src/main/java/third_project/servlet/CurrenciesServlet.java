@@ -33,11 +33,11 @@ public class CurrenciesServlet extends BaseServlet {
             String sign = request.getParameter("sign");
 
             if (!Validation.areThreeStringsValid(name, code, sign)) {
-                System.err.println("invalid parameters");
+                log.info("invalid parameters");
                 throw new IllegalArgumentException("Invalid parameters");
             }
             if (currenciesDbConnector.findByCode(code) != null) {
-                System.err.println("currency with such code already exists");
+                log.info("currency with such code already exists");
                 throw new IllegalStateException("Currency with such code already exists");
             }
             Currency currency = currenciesDbConnector.insert(code, name, sign);
@@ -45,17 +45,17 @@ public class CurrenciesServlet extends BaseServlet {
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (IllegalArgumentException e) {
-            System.err.println("invalid parameters");
+            log.info("invalid parameters");
             log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
-            System.err.println("currency with such code already exists");
+            log.info("currency with such code already exists");
             log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
-            System.out.println("error by currencies servlet, cause: " + e.getMessage());
+            log.info("error by currencies servlet, cause: " + e.getMessage());
             e.printStackTrace();
             log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -70,14 +70,14 @@ public class CurrenciesServlet extends BaseServlet {
             ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
             if (!Validation.isListValid(currencies)) {
-                System.out.println("error by currencies servlet, cause: currencies list is null or empty");
+                log.info("error by currencies servlet, cause: currencies list is null or empty");
                 throw new IllegalStateException("currencies list is null or empty");
             }
 
             mapper.writeValue(response.getWriter(), currencies);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            System.out.println("error by currencies servlet, cause: " + e.getMessage());
+            log.info("error by currencies servlet, cause: " + e.getMessage());
             e.printStackTrace();
             log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

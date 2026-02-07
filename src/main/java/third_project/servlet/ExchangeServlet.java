@@ -57,7 +57,7 @@ public class ExchangeServlet extends BaseServlet {
                 BigDecimal convertedAmount = amount.multiply(rate.getRate());
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
-                System.out.println(result);
+                log.info(result.toString());
                 response.getWriter().write(result.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
             } else if (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()))) {
@@ -65,7 +65,7 @@ public class ExchangeServlet extends BaseServlet {
                 BigDecimal convertedAmount = amount.multiply(new BigDecimal(1).divide(rate.getRate(), 6, RoundingMode.HALF_UP));
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
-                System.out.println(result);
+                log.info(result.toString());
                 response.getWriter().write(result.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
             } else if (Validation.isExchangeRateExist(ExchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId())) &&
@@ -75,7 +75,7 @@ public class ExchangeServlet extends BaseServlet {
                 BigDecimal convertedAmount = amount.multiply(firstRate.getRate()).divide(secondRate.getRate(), 6, RoundingMode.HALF_UP);
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
-                System.out.println(result);
+                log.info(result.toString());
                 log.info("exchange result: " + result);
                 response.getWriter().write(result.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -87,7 +87,7 @@ public class ExchangeServlet extends BaseServlet {
 
         } catch (Exception e) {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage());
-            System.out.println("Exchange servlet: Exception in doGet");
+            log.info("Exchange servlet: Exception in doGet");
             System.err.println(e);
             response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

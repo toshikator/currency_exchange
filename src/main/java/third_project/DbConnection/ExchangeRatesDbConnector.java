@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
 
 public class ExchangeRatesDbConnector {
 
     // Strict whitelist for table/identifier names to mitigate SQL injection via config
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
+    private static final Logger log = Logger.getLogger("com.example");
     static String tableName;
     static int idColumnNumber;
     static int baseCurrencyIdColumnNumber;

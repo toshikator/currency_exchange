@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public final class HikariPool {
     private static volatile HikariPool INSTANCE;

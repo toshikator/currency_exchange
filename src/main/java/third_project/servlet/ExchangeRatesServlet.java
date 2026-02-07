@@ -45,7 +45,7 @@ public class ExchangeRatesServlet extends BaseServlet {
                 return result;
             }).collect(Collectors.toList());
             if (!Validation.isListValid(exchangeRates)) {
-                System.err.println("empty dataset of DTOs");
+                log.info("empty dataset of DTOs");
                 throw new IllegalStateException("empty dataset of DTOs");
             }
 
@@ -53,14 +53,14 @@ public class ExchangeRatesServlet extends BaseServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IllegalStateException e) {
             log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage());
-            System.err.println("empty dataset of DTOs");
+            log.info("empty dataset of DTOs");
             response.getWriter().println("empty dataset of DTOs");
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
             log.info("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage());
-            System.err.println("servlet global error: " + e.getMessage());
+            log.info("servlet global error: " + e.getMessage());
             e.printStackTrace();
             response.getWriter().println("servlet global error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -104,7 +104,7 @@ public class ExchangeRatesServlet extends BaseServlet {
 
             ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
-                System.err.println("exchange rate already exists");
+                log.info("exchange rate already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
@@ -119,7 +119,7 @@ public class ExchangeRatesServlet extends BaseServlet {
             mapper.writeValue(response.getWriter(), dto);
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (NumberFormatException nfe) {
-            System.err.println("rate must be a number");
+            log.info("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());
             nfe.printStackTrace();
             log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): " + nfe.getMessage());
@@ -127,12 +127,12 @@ public class ExchangeRatesServlet extends BaseServlet {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             response.getWriter().println("invalid currency" + e.getMessage());
-            System.err.println("invalid currency code");
+            log.info("invalid currency code");
             log.info("ExchangeRatesServlet IllegalArgumentException exception(doPOST): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             e.printStackTrace();
-            System.err.println("invalid parameters");
+            log.info("invalid parameters");
             log.info("ExchangeRatesServlet IllegalStateException exception(doPOST): " + e.getMessage());
             response.getWriter().println("invalid parameters" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
