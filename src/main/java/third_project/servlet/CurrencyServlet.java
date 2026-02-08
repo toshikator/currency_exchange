@@ -39,7 +39,6 @@ public class CurrencyServlet extends BaseServlet {
             if (currency == null) {
                 throw new ServletException("Currency not found");
             }
-            PrintWriter out = response.getWriter();
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_OK);

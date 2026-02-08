@@ -15,7 +15,6 @@ public final class Validation {
 
     private static final CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
 
-    private static final ExchangeRatesDbConnector exchangeRatesDbConnector = new ExchangeRatesDbConnector();
 
     public static boolean isStringValid(String str) {
         return str != null && !str.isEmpty();
@@ -24,7 +23,7 @@ public final class Validation {
     public static boolean isStringConvertableToBigDecimal(String str) throws IllegalArgumentException {
         System.out.println("string on validation" + " " + str);
         try {
-            BigDecimal bd = new BigDecimal(str);
+            new BigDecimal(str);
             return true;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format");

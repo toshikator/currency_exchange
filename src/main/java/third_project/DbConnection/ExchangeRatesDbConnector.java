@@ -18,7 +18,6 @@ public class ExchangeRatesDbConnector {
 
     // Strict whitelist for table/identifier names to mitigate SQL injection via config
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    private static final Logger log = Logger.getLogger("com.example");
     static String tableName;
     static int idColumnNumber;
     static int baseCurrencyIdColumnNumber;
@@ -36,11 +35,6 @@ public class ExchangeRatesDbConnector {
                     props.load(in);
                 }
             }
-            String address = props.getProperty("address");
-            String port = props.getProperty("port");
-            String databaseName = props.getProperty("databaseName");
-            String username = props.getProperty("username");
-            String password = props.getProperty("password");
             tableName = props.getProperty("tableNameExchangeRates");
             if (tableName == null || !SAFE_IDENTIFIER.matcher(tableName).matches()) {
                 throw new IllegalStateException("Unsafe table name for ExchangeRates: " + tableName);
@@ -50,8 +44,6 @@ public class ExchangeRatesDbConnector {
             baseCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.baseCurrencyId"));
             targetCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.targetCurrencyId"));
             rateColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.rate"));
-
-                        String url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
         } catch (Exception e) {
             System.out.println("Failed to load database configuration for ExchangeRatesDB");
             System.err.println(e);
