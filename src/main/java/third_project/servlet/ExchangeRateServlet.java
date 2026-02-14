@@ -54,7 +54,7 @@ public class ExchangeRateServlet extends BaseServlet {
             }
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
-            ExchangeRate rate = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
 
             response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP))));
             response.setStatus(HttpServletResponse.SC_OK);
@@ -81,6 +81,7 @@ public class ExchangeRateServlet extends BaseServlet {
             log.info("pathInfo: " + pathInfo);
 
             if (!Validation.isPatchRequestValid(pathInfo)) {
+                log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo);
                 throw new IllegalArgumentException("Invalid pathInfo");
             }
 
@@ -103,6 +104,7 @@ public class ExchangeRateServlet extends BaseServlet {
             log.info("rateParam: " + rateParam);
             if (!Validation.isStringValid(rateParam)) {
                 log.info("String is invalid");
+                log.warning("ExchangeRateServlet: Invalid rate parameter: " + rateParam);
                 throw new IllegalArgumentException("Invalid rate parameter");
             }
 
@@ -111,6 +113,7 @@ public class ExchangeRateServlet extends BaseServlet {
             BigDecimal newRate = new BigDecimal(rateParam);
 
             if (Validation.isZeroOrNegative(newRate)) {
+                log.warning("ExchangeRateServlet: Invalid rate value: " + newRate);
                 throw new IllegalArgumentException("Invalid rate value");
             }
 
@@ -119,7 +122,7 @@ public class ExchangeRateServlet extends BaseServlet {
             baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode).getId();
             targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode).getId();
 
-            ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
+            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
                 throw new NullPointerException("Exchange rate not found");
             }

@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -18,29 +19,26 @@ public class ExchangeRatesDbConnector {
 
     // Strict whitelist for table/identifier names to mitigate SQL injection via config
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    static String tableName;
-    static int idColumnNumber;
-    static int baseCurrencyIdColumnNumber;
-    static int targetCurrencyIdColumnNumber;
-    static int rateColumnNumber;
-    static CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
+    private final String tableName;
+    private final int idColumnNumber;
+    private final int baseCurrencyIdColumnNumber;
+    private final int targetCurrencyIdColumnNumber;
+    private final int rateColumnNumber;
+    private final CurrenciesDbConnector currenciesDbConnector;
     private final DataSource ds;
 
-    static {
-        PropertiesReader pr = PropertiesReader.getInstance();
-        tableName = pr.getExchangeRatesTableName();
-        idColumnNumber = pr.getExchangeRatesIdCol();
-        baseCurrencyIdColumnNumber = pr.getBaseCurrencyIdCol();
-        targetCurrencyIdColumnNumber = pr.getTargetCurrencyIdCol();
-        rateColumnNumber = pr.getRateCol();
-    }
-
-    public ExchangeRatesDbConnector() {
-        this.ds = HikariPool.get();
+    public ExchangeRatesDbConnector(DataSource ds, PropertiesReader pr, CurrenciesDbConnector currenciesDbConnector) {
+        this.ds = ds;
+        this.tableName = pr.getExchangeRatesTableName();
+        this.idColumnNumber = pr.getExchangeRatesIdCol();
+        this.baseCurrencyIdColumnNumber = pr.getBaseCurrencyIdCol();
+        this.targetCurrencyIdColumnNumber = pr.getTargetCurrencyIdCol();
+        this.rateColumnNumber = pr.getRateCol();
+        this.currenciesDbConnector = currenciesDbConnector;
     }
 
 
-    public static ExchangeRate findRate(int baseCurrencyId, int targetCurrencyId) {
+    public ExchangeRate findRate(int baseCurrencyId, int targetCurrencyId) {
         if (baseCurrencyId == 0 || targetCurrencyId == 0) return null;
 
         if (baseCurrencyId == targetCurrencyId) return null;
@@ -151,7 +149,7 @@ public class ExchangeRatesDbConnector {
                     ps.executeUpdate();
                 }
             }
-            exchangeRate = ExchangeRatesDbConnector.findRate(currenciesDbConnector.findById(baseCurrencyCode).getId(), currenciesDbConnector.findById(targetCurrencyCode).getId());
+            exchangeRate = this.findRate(currenciesDbConnector.findById(baseCurrencyCode).getId(), currenciesDbConnector.findById(targetCurrencyCode).getId());
         } catch (Exception e) {
             System.out.println("insert exception: " + e);
             System.err.println(e);

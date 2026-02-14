@@ -4,6 +4,7 @@ import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
 
 import java.math.BigDecimal;
+import java.util.logging.Logger;
 
 public class DTOExchangeRate implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
@@ -19,11 +20,18 @@ public class DTOExchangeRate implements java.io.Serializable {
         this.id = id;
         try {
             this.baseCurrency = baseCurrency;
-            if (this.baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency ID provided");
+            if (this.baseCurrency == null) {
+                Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid baseCurrency ID provided (null)");
+                throw new IllegalArgumentException("Invalid baseCurrency ID provided");
+            }
             this.targetCurrency = targetCurrency;
-            if (this.targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency ID provided");
+            if (this.targetCurrency == null) {
+                Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid targetCurrency ID provided (null)");
+                throw new IllegalArgumentException("Invalid targetCurrency ID provided");
+            }
 
         } catch (IllegalArgumentException e) {
+            Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid currency ID provided");
             throw new IllegalArgumentException("Invalid currency ID provided", e);
         }
         this.rate = rate;

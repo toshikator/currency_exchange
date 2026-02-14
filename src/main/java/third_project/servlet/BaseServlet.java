@@ -16,10 +16,14 @@ public class BaseServlet extends jakarta.servlet.http.HttpServlet {
         super.init();
         log.info("ExchangeRateServlet init");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
-        if (currenciesDbConnector == null)
+        if (currenciesDbConnector == null) {
+            log.severe("currenciesDbConnector not found in ServletContext");
             throw new ServletException("currenciesDbConnector not found in ServletContext");
+        }
         exchangeRatesDbConnector = (ExchangeRatesDbConnector) getServletContext().getAttribute("exchangeRatesDbConnector");
-        if (exchangeRatesDbConnector == null)
+        if (exchangeRatesDbConnector == null) {
+            log.severe("exchangeRatesDbConnector not found in ServletContext");
             throw new ServletException("exchangeRatesDbConnector not found in ServletContext");
+        }
     }
 }

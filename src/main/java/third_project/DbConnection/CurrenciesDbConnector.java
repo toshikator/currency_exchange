@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -25,14 +26,13 @@ public class CurrenciesDbConnector {
     private final String tableName;
 
 
-    public CurrenciesDbConnector() {
-        PropertiesReader pr = PropertiesReader.getInstance();
+    public CurrenciesDbConnector(DataSource ds, PropertiesReader pr) {
         this.tableName = pr.getCurrenciesTableName();
         this.idColumnNumber = pr.getCurrenciesIdCol();
         this.codeColumnNumber = pr.getCurrenciesCodeCol();
         this.fullNameColumnNumber = pr.getCurrenciesFullNameCol();
         this.signColumnNumber = pr.getCurrenciesSignCol();
-        this.ds = HikariPool.get();
+        this.ds = ds;
     }
 
     public Currency insert(String code, String name, String sign) {

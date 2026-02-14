@@ -13,9 +13,6 @@ import java.util.List;
 
 public final class Validation {
 
-    private static final CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
-
-
     public static boolean isStringValid(String str) {
         return str != null && !str.isEmpty();
     }
@@ -58,17 +55,16 @@ public final class Validation {
         return currency != null && currency.getId() > 0 && currency.getCode() != null && currency.getFullName() != null && currency.getSign() != null;
     }
 
-    public static boolean isCurrencyExist(String currencyCode) throws SQLException {
+    public static boolean isCurrencyExist(String currencyCode, CurrenciesDbConnector currenciesDbConnector) throws SQLException {
         return currenciesDbConnector.findByCode(currencyCode) != null;
     }
 
     public static boolean isValidExchangeRate(ExchangeRate exRate) {
-        return isCurrencyValid(currenciesDbConnector.findById(exRate.getBaseCurrencyId())) &&
-                isCurrencyValid(currenciesDbConnector.findById(exRate.getTargetCurrencyId())) &&
+        return exRate != null && exRate.getBaseCurrencyId() > 0 && exRate.getTargetCurrencyId() > 0 &&
                 exRate.getRate() != null && exRate.getRate().compareTo(BigDecimal.ZERO) > 0;
     }
 
     public static boolean isExchangeRateExist(ExchangeRate exRate) {
-        return isValidExchangeRate(exRate) && ExchangeRatesDbConnector.findRate(exRate.getBaseCurrencyId(), exRate.getTargetCurrencyId()) != null;
+        return exRate != null;
     }
 }

@@ -79,6 +79,7 @@ public class ExchangeRatesServlet extends BaseServlet {
             log.info("ExchangeRatesServlet doPost parameters: " + Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
 
             if (!Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
+                log.warning("ExchangeRatesServlet: invalid parameters: base=" + baseCurrencyCode + ", target=" + targetCurrencyCode + ", rate=" + rateParam);
                 throw new IllegalStateException("invalid parameters");
             }
 
@@ -86,6 +87,7 @@ public class ExchangeRatesServlet extends BaseServlet {
             targetCurrencyCode = targetCurrencyCode.toUpperCase();
 
             if (baseCurrencyCode.equals(targetCurrencyCode)) {
+                log.warning("ExchangeRatesServlet: baseCurrencyCode and targetCurrencyCode must be different: " + baseCurrencyCode);
                 throw new IllegalStateException("baseCurrencyCode and targetCurrencyCode must be different");
             }
 
@@ -93,16 +95,18 @@ public class ExchangeRatesServlet extends BaseServlet {
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
 
             if (!Validation.isCurrencyValid(baseCurrency) || !Validation.isCurrencyValid(targetCurrency)) {
+                log.warning("ExchangeRatesServlet: invalid currency code(s): base=" + baseCurrencyCode + ", target=" + targetCurrencyCode);
                 throw new IllegalArgumentException("invalid currency ");
             }
 
             BigDecimal rate;
             rate = new BigDecimal(rateParam);
             if (Validation.isZeroOrNegative(rate)) {
+                log.warning("ExchangeRatesServlet: rate must be positive: " + rateParam);
                 throw new NumberFormatException("rate must be positive");
             }
 
-            ExchangeRate existing = ExchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
                 log.info("exchange rate already exists");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);

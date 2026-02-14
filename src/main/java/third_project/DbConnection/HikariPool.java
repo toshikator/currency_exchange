@@ -4,21 +4,24 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import third_project.service.PropertiesReader;
 
 public final class HikariPool {
+    private static final Logger log = Logger.getLogger("com.example");
     private static volatile HikariPool INSTANCE;
+    private static volatile PropertiesReader PR_REF;
 
     private final HikariDataSource ds;
     private final String username;
     private final String password;
     private final String url;
 
-    private HikariPool() {
+    private HikariPool(PropertiesReader pr) {
         try {
-            System.out.println("Initializing HikariCP pool...");
-            PropertiesReader pr = PropertiesReader.getInstance();
+            log.info("Initializing HikariCP pool...");
             String address = pr.getAddress();
             String port = pr.getPort();
             String databaseName = pr.getDatabaseName();
@@ -29,6 +32,7 @@ public final class HikariPool {
             try {
                 Class.forName("oracle.jdbc.OracleDriver");
             } catch (ClassNotFoundException cnfe) {
+                log.log(Level.SEVERE, "Oracle JDBC driver class not found. Ensure ojdbc JAR is on the classpath.", cnfe);
                 throw new RuntimeException("Oracle JDBC driver class not found. Ensure ojdbc JAR is on the classpath.", cnfe);
             }
 
@@ -36,25 +40,41 @@ public final class HikariPool {
             cfg.setJdbcUrl(url);
             cfg.setUsername(username);
             cfg.setPassword(password);
-            // Explicitly declare the driver so Hikari doesn't rely on auto-detection
+
             cfg.setDriverClassName("oracle.jdbc.OracleDriver");
             cfg.setPoolName("app-pool");
-            // Do not fail deployment if DB is temporarily unavailable
+
             cfg.setInitializationFailTimeout(-1);
             cfg.setMinimumIdle(0);
             ds = new HikariDataSource(cfg);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    System.out.println("Shutting down HikariCP pool...");
+                    log.info("Shutting down HikariCP pool...");
                     HikariPool.shutdown();
                 } catch (Throwable t) {
-                    System.err.println("Error while shutting down HikariCP: " + t);
+                    log.log(Level.SEVERE, "Error while shutting down HikariCP", t);
                 }
             }, "hikari-shutdown"));
 
         } catch (Exception e) {
+            log.log(Level.SEVERE, "Failed to initialize HikariCP pool", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void init(PropertiesReader pr) {
+        if (pr == null) {
+            log.log(Level.SEVERE, "PropertiesReader must not be null");
+            throw new IllegalArgumentException("PropertiesReader must not be null");
+        }
+        synchronized (HikariPool.class) {
+            if (PR_REF == null) {
+                PR_REF = pr;
+            }
+            if (INSTANCE == null) {
+                INSTANCE = new HikariPool(PR_REF);
+            }
         }
     }
 
@@ -64,16 +84,17 @@ public final class HikariPool {
             synchronized (HikariPool.class) {
                 local = INSTANCE;
                 if (local == null) {
-                    local = new HikariPool();
+                    if (PR_REF == null) {
+                        log.log(Level.SEVERE, "HikariPool not initialized. Call HikariPool.init(PropertiesReader) from ContextListener before use.");
+                        throw new IllegalStateException("HikariPool not initialized. Call HikariPool.init(PropertiesReader) from ContextListener before use.");
+                    }
+                    local = new HikariPool(PR_REF);
                     INSTANCE = local;
                 }
             }
         }
-        System.out.println("Hikari pool data");
-        System.out.println("Address/URL: " + local.url);
-        System.out.println("Username: " + local.username);
-        System.out.println("Password: " + local.password);
-        System.out.println(local.ds.toString());
+        // Do not log sensitive data like credentials.
+        log.info("HikariPool is ready (DataSource initialized).");
         return local.ds;
     }
 

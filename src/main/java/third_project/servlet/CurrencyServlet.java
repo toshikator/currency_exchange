@@ -31,12 +31,14 @@ public class CurrencyServlet extends BaseServlet {
         try {
             String pathInfo = request.getPathInfo();
             if (!Validation.isStringValid(pathInfo)) {
+                log.warning("CurrencyServlet: Invalid pathInfo: " + pathInfo);
                 throw new IllegalArgumentException("Invalid pathInfo");
             }
             Currency currency;
 
-            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1)) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
+            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1), currenciesDbConnector) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
             if (currency == null) {
+                log.warning("CurrencyServlet: Currency not found for pathInfo=" + pathInfo);
                 throw new ServletException("Currency not found");
             }
             ObjectMapper mapper = new ObjectMapper();

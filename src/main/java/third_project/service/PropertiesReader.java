@@ -39,6 +39,7 @@ public final class PropertiesReader {
                 if (in != null) {
                     connectivity.load(in);
                 } else {
+                    log.severe("configs/connectivity.properties not found on classpath");
                     throw new IllegalStateException("configs/connectivity.properties not found on classpath");
                 }
             }
@@ -48,6 +49,7 @@ public final class PropertiesReader {
                 if (in != null) {
                     db.load(in);
                 } else {
+                    log.severe("configs/db.properties not found on classpath");
                     throw new IllegalStateException("configs/db.properties not found on classpath");
                 }
             }
@@ -85,6 +87,7 @@ public final class PropertiesReader {
     private static String required(Properties props, String key) {
         String v = props.getProperty(key);
         if (v == null || v.trim().isEmpty()) {
+            log.severe("Required property missing: " + key);
             throw new IllegalStateException("Required property missing: " + key);
         }
         return v.trim();
