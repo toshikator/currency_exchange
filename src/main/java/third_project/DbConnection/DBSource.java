@@ -6,27 +6,59 @@ import java.util.logging.Logger;
 
 import third_project.service.PropertiesReader;
 
-/**
- * Singleton facade for application DataSource.
- *
- * This class delegates pool creation and lifecycle to {@link HikariPool}
- * and exposes a simple singleton access pattern.
- */
+
 public final class DBSource {
     private static final Logger log = Logger.getLogger("com.example");
     private static volatile DBSource INSTANCE;
+
+    // Database connectivity properties (copied from PropertiesReader at initialization)
+    private final String address;
+    private final String port;
+    private final String databaseName;
+    private final String username;
+    private final String password;
+
+    // DB schema/table and columns configuration
+    private final String currenciesTableName;
+    private final int currenciesIdCol;
+    private final int currenciesCodeCol;
+    private final int currenciesFullNameCol;
+    private final int currenciesSignCol;
+
+    private final String exchangeRatesTableName;
+    private final int exchangeRatesIdCol;
+    private final int baseCurrencyIdCol;
+    private final int targetCurrencyIdCol;
+    private final int rateCol;
+
+    // Resolved DataSource
     private final DataSource ds;
 
     private DBSource(PropertiesReader pr) {
-        // Delegate initialization to HikariPool to avoid duplicating config logic
+        // Copy all properties to immutable fields
+        this.address = pr.getAddress();
+        this.port = pr.getPort();
+        this.databaseName = pr.getDatabaseName();
+        this.username = pr.getUsername();
+        this.password = pr.getPassword();
+
+        this.currenciesTableName = pr.getCurrenciesTableName();
+        this.currenciesIdCol = pr.getCurrenciesIdCol();
+        this.currenciesCodeCol = pr.getCurrenciesCodeCol();
+        this.currenciesFullNameCol = pr.getCurrenciesFullNameCol();
+        this.currenciesSignCol = pr.getCurrenciesSignCol();
+
+        this.exchangeRatesTableName = pr.getExchangeRatesTableName();
+        this.exchangeRatesIdCol = pr.getExchangeRatesIdCol();
+        this.baseCurrencyIdCol = pr.getBaseCurrencyIdCol();
+        this.targetCurrencyIdCol = pr.getTargetCurrencyIdCol();
+        this.rateCol = pr.getRateCol();
+
+        // Initialize the underlying pool and DataSource
         HikariPool.init(pr);
         this.ds = HikariPool.get();
     }
 
-    /**
-     * Initialize the DBSource singleton with application properties.
-     * Safe to call multiple times; only the first call performs initialization.
-     */
     public static void init(PropertiesReader pr) {
         if (pr == null) {
             log.log(Level.SEVERE, "PropertiesReader must not be null");
@@ -44,9 +76,6 @@ public final class DBSource {
         }
     }
 
-    /**
-     * Returns the singleton instance. Make sure {@link #init(PropertiesReader)} was called earlier.
-     */
     public static DBSource getInstance() {
         DBSource local = INSTANCE;
         if (local == null) {
@@ -56,28 +85,79 @@ public final class DBSource {
         return local;
     }
 
-    /**
-     * Convenience accessor for the underlying DataSource.
-     */
-    public DataSource getDataSource() {
-        return ds;
-    }
-
-    /**
-     * Convenience static accessor that returns the shared DataSource directly.
-     */
     public static DataSource get() {
         return getInstance().getDataSource();
     }
 
-    /**
-     * Shutdown underlying pool and reset singleton.
-     */
     public static void shutdown() {
         try {
             HikariPool.shutdown();
         } finally {
             INSTANCE = null;
         }
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getCurrenciesTableName() {
+        return currenciesTableName;
+    }
+
+    public int getCurrenciesIdCol() {
+        return currenciesIdCol;
+    }
+
+    public int getCurrenciesCodeCol() {
+        return currenciesCodeCol;
+    }
+
+    public int getCurrenciesFullNameCol() {
+        return currenciesFullNameCol;
+    }
+
+    public int getCurrenciesSignCol() {
+        return currenciesSignCol;
+    }
+
+    public String getExchangeRatesTableName() {
+        return exchangeRatesTableName;
+    }
+
+    public int getExchangeRatesIdCol() {
+        return exchangeRatesIdCol;
+    }
+
+    public int getBaseCurrencyIdCol() {
+        return baseCurrencyIdCol;
+    }
+
+    public int getTargetCurrencyIdCol() {
+        return targetCurrencyIdCol;
+    }
+
+    public int getRateCol() {
+        return rateCol;
+    }
+
+    public DataSource getDataSource() {
+        return ds;
     }
 }

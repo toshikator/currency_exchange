@@ -4,8 +4,6 @@ package third_project.DbConnection;
 import third_project.entities.Currency;
 import third_project.service.PropertiesReader;
 
-import javax.sql.DataSource;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -18,7 +16,6 @@ public class CurrenciesDbConnector {
     private static final Logger log = Logger.getLogger("com.example");
 
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    private final DataSource ds;
     private final int idColumnNumber;
     private final int codeColumnNumber;
     private final int fullNameColumnNumber;
@@ -26,20 +23,19 @@ public class CurrenciesDbConnector {
     private final String tableName;
 
 
-    public CurrenciesDbConnector(DataSource ds, PropertiesReader pr) {
+    public CurrenciesDbConnector(PropertiesReader pr) {
         this.tableName = pr.getCurrenciesTableName();
         this.idColumnNumber = pr.getCurrenciesIdCol();
         this.codeColumnNumber = pr.getCurrenciesCodeCol();
         this.fullNameColumnNumber = pr.getCurrenciesFullNameCol();
         this.signColumnNumber = pr.getCurrenciesSignCol();
-        this.ds = ds;
     }
 
     public Currency insert(String code, String name, String sign) {
 
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
 
                 String sql = "INSERT INTO " + tableName + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -61,7 +57,7 @@ public class CurrenciesDbConnector {
 
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
 
                 String sql = "UPDATE " + tableName + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -84,7 +80,7 @@ public class CurrenciesDbConnector {
 
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
 
                 String sql = "DELETE FROM " + tableName + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -104,7 +100,7 @@ public class CurrenciesDbConnector {
         Currency currency = null;
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
                 String sql = "SELECT * FROM " + tableName + " WHERE CODE = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setString(1, code.toUpperCase());
@@ -131,7 +127,7 @@ public class CurrenciesDbConnector {
         Currency currency = null;
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
                 String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
@@ -158,7 +154,7 @@ public class CurrenciesDbConnector {
         ArrayList<Currency> currencies = new ArrayList<Currency>();
         try {
 
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
 
                 try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
                     try (ResultSet resultSet = ps.executeQuery()) {

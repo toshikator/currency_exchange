@@ -7,10 +7,9 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.DbConnection.ExchangeRatesDbConnector;
-import third_project.DbConnection.HikariPool;
+import third_project.DbConnection.DBSource;
 import third_project.service.PropertiesReader;
 
-import javax.sql.DataSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,16 +26,14 @@ public class ContextListener implements ServletContextListener {
             PropertiesReader propertiesReader = PropertiesReader.getInstance();
             ctx.setAttribute("propertiesReader", propertiesReader);
 
-            // Initialize and expose a shared DataSource
-            HikariPool.init(propertiesReader);
-            DataSource ds = HikariPool.get();
-            ctx.setAttribute("datasource", ds);
+            // Initialize and expose a shared DBSource (wraps pooled DataSource)
+            DBSource.init(propertiesReader);
 
             // Initialize and expose DAO/connector singletons
-            CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector(ds, propertiesReader);
+            CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector(propertiesReader);
             ctx.setAttribute("currenciesDbConnector", currenciesDbConnector);
 
-            ExchangeRatesDbConnector exchangeRatesDbConnector = new ExchangeRatesDbConnector(ds, propertiesReader, currenciesDbConnector);
+            ExchangeRatesDbConnector exchangeRatesDbConnector = new ExchangeRatesDbConnector(propertiesReader, currenciesDbConnector);
             ctx.setAttribute("exchangeRatesDbConnector", exchangeRatesDbConnector);
         } catch (Throwable t) {
             log.log(Level.SEVERE, "Failed to initialize application context", t);

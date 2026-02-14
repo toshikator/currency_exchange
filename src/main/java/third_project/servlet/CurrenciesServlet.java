@@ -45,17 +45,17 @@ public class CurrenciesServlet extends BaseServlet {
             mapper.writeValue(response.getWriter(), currency);
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (IllegalArgumentException e) {
-            log.info("invalid parameters");
+
             log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
-            log.info("currency with such code already exists");
+
             log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
-            log.info("error by currencies servlet, cause: " + e.getMessage());
+
             e.printStackTrace();
             log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -77,7 +77,7 @@ public class CurrenciesServlet extends BaseServlet {
             mapper.writeValue(response.getWriter(), currencies);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            log.info("error by currencies servlet, cause: " + e.getMessage());
+
             e.printStackTrace();
             log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

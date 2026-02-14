@@ -10,7 +10,6 @@ import third_project.entities.Currency;
 import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.service.Validation;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;

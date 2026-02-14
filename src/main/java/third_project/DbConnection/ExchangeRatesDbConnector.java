@@ -5,7 +5,6 @@ import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 import third_project.service.PropertiesReader;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,10 +24,8 @@ public class ExchangeRatesDbConnector {
     private final int targetCurrencyIdColumnNumber;
     private final int rateColumnNumber;
     private final CurrenciesDbConnector currenciesDbConnector;
-    private final DataSource ds;
 
-    public ExchangeRatesDbConnector(DataSource ds, PropertiesReader pr, CurrenciesDbConnector currenciesDbConnector) {
-        this.ds = ds;
+    public ExchangeRatesDbConnector(PropertiesReader pr, CurrenciesDbConnector currenciesDbConnector) {
         this.tableName = pr.getExchangeRatesTableName();
         this.idColumnNumber = pr.getExchangeRatesIdCol();
         this.baseCurrencyIdColumnNumber = pr.getBaseCurrencyIdCol();
@@ -45,7 +42,7 @@ public class ExchangeRatesDbConnector {
 
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = HikariPool.get().getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
                 String sql = "SELECT * FROM " + tableName + " WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, baseCurrencyId);
@@ -73,7 +70,7 @@ public class ExchangeRatesDbConnector {
     public ExchangeRate update(int baseCurrencyId, int targetCurrencyId, BigDecimal newRate) {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
                 String sql = "UPDATE " + tableName + " SET RATE = ? WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setBigDecimal(1, newRate);
@@ -98,7 +95,7 @@ public class ExchangeRatesDbConnector {
         ArrayList<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
 
                 try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
                     try (ResultSet resultSet = ps.executeQuery()) {
@@ -140,7 +137,7 @@ public class ExchangeRatesDbConnector {
         ExchangeRate exchangeRate = null;
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
-            try (Connection conn = ds.getConnection()) {
+            try (Connection conn = DBSource.get().getConnection()) {
                 String sql = "INSERT INTO " + tableName + " (BASECURRENCYID, TARGETCURRENCYID, RATE) VALUES (?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, baseCurrencyCode);
