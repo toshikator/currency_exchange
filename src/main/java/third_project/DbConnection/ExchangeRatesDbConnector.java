@@ -3,13 +3,13 @@ package third_project.DbConnection;
 
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
+import third_project.service.PropertiesReader;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.logging.Logger;
 
@@ -26,28 +26,16 @@ public class ExchangeRatesDbConnector {
     static CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector();
     private final DataSource ds;
 
+    static {
+        PropertiesReader pr = PropertiesReader.getInstance();
+        tableName = pr.getExchangeRatesTableName();
+        idColumnNumber = pr.getExchangeRatesIdCol();
+        baseCurrencyIdColumnNumber = pr.getBaseCurrencyIdCol();
+        targetCurrencyIdColumnNumber = pr.getTargetCurrencyIdCol();
+        rateColumnNumber = pr.getRateCol();
+    }
 
     public ExchangeRatesDbConnector() {
-        try {
-            Properties props = new Properties();
-            try (java.io.InputStream in = ExchangeRatesDbConnector.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
-                if (in != null) {
-                    props.load(in);
-                }
-            }
-            tableName = props.getProperty("tableNameExchangeRates");
-            if (tableName == null || !SAFE_IDENTIFIER.matcher(tableName).matches()) {
-                throw new IllegalStateException("Unsafe table name for ExchangeRates: " + tableName);
-            }
-
-            idColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.id"));
-            baseCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.baseCurrencyId"));
-            targetCurrencyIdColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.targetCurrencyId"));
-            rateColumnNumber = Integer.parseInt(props.getProperty("exchangeRates.columns.rate"));
-        } catch (Exception e) {
-            System.out.println("Failed to load database configuration for ExchangeRatesDB");
-            System.err.println(e);
-        }
         this.ds = HikariPool.get();
     }
 

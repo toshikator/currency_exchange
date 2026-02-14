@@ -4,9 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.logging.Logger;
+import third_project.service.PropertiesReader;
 
 public final class HikariPool {
     private static volatile HikariPool INSTANCE;
@@ -19,22 +18,12 @@ public final class HikariPool {
     private HikariPool() {
         try {
             System.out.println("Initializing HikariCP pool...");
-            Properties props = new Properties();
-            try (java.io.InputStream in = HikariPool.class.getClassLoader().getResourceAsStream("configs/connectivity.properties")) {
-                if (in != null) {
-                    props.load(in);
-                    System.out.println("HikariCP pool initialized successfully");
-                }
-            } catch (IOException e) {
-                System.out.println("Failed to load database configuration for HikariCP");
-                System.err.println(e.getMessage());
-                throw new RuntimeException(e);
-            }
-            String address = props.getProperty("address");
-            String port = props.getProperty("port");
-            String databaseName = props.getProperty("databaseName");
-            username = props.getProperty("username");
-            password = props.getProperty("password");
+            PropertiesReader pr = PropertiesReader.getInstance();
+            String address = pr.getAddress();
+            String port = pr.getPort();
+            String databaseName = pr.getDatabaseName();
+            username = pr.getUsername();
+            password = pr.getPassword();
 
             url = String.format("jdbc:oracle:thin:@//%s:%s/%s", address, port, databaseName);
             try {
@@ -81,7 +70,7 @@ public final class HikariPool {
             }
         }
         System.out.println("Hikari pool data");
-        System.out.println("Address: " + local.url);
+        System.out.println("Address/URL: " + local.url);
         System.out.println("Username: " + local.username);
         System.out.println("Password: " + local.password);
         System.out.println(local.ds.toString());

@@ -2,13 +2,12 @@ package third_project.DbConnection;
 
 
 import third_project.entities.Currency;
-
+import third_project.service.PropertiesReader;
 
 import javax.sql.DataSource;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.logging.Logger;
 
@@ -19,37 +18,20 @@ public class CurrenciesDbConnector {
 
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
     private final DataSource ds;
-    private int idColumnNumber;
-    private int codeColumnNumber;
-    private int fullNameColumnNumber;
-    private int signColumnNumber;
-    private String tableName;
+    private final int idColumnNumber;
+    private final int codeColumnNumber;
+    private final int fullNameColumnNumber;
+    private final int signColumnNumber;
+    private final String tableName;
 
 
     public CurrenciesDbConnector() {
-
-        try {
-            Properties props = new Properties();
-            try (java.io.InputStream in = CurrenciesDbConnector.class.getClassLoader().getResourceAsStream("configs/db.properties")) {
-                if (in != null) {
-                    props.load(in);
-                }
-            }
-            String tbl = props.getProperty("currencies.table.name");
-            if (tbl == null || tbl.isEmpty()) {
-                tbl = props.getProperty("tableNameCurrencies");
-            }
-            this.tableName = tbl;
-            idColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.id"));
-            codeColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.code"));
-            fullNameColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.fullName"));
-            signColumnNumber = Integer.parseInt(props.getProperty("currencies.columns.sign"));
-
-
-        } catch (Exception ex) {
-            log.info("Exception in CurrenciesDbConnection constructor");
-            log.info(String.valueOf(ex));
-        }
+        PropertiesReader pr = PropertiesReader.getInstance();
+        this.tableName = pr.getCurrenciesTableName();
+        this.idColumnNumber = pr.getCurrenciesIdCol();
+        this.codeColumnNumber = pr.getCurrenciesCodeCol();
+        this.fullNameColumnNumber = pr.getCurrenciesFullNameCol();
+        this.signColumnNumber = pr.getCurrenciesSignCol();
         this.ds = HikariPool.get();
     }
 
