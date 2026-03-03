@@ -10,27 +10,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class ExchangeRatesDbConnector {
 
-    // Strict whitelist for table/identifier names to mitigate SQL injection via config
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger("com.example");
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    private final String tableName;
-    private final int idColumnNumber;
-    private final int baseCurrencyIdColumnNumber;
-    private final int targetCurrencyIdColumnNumber;
-    private final int rateColumnNumber;
     private final CurrenciesDbConnector currenciesDbConnector;
+    PropertiesReader pr;
 
     public ExchangeRatesDbConnector(PropertiesReader pr, CurrenciesDbConnector currenciesDbConnector) {
-        this.tableName = pr.getExchangeRatesTableName();
-        this.idColumnNumber = pr.getExchangeRatesIdCol();
-        this.baseCurrencyIdColumnNumber = pr.getBaseCurrencyIdCol();
-        this.targetCurrencyIdColumnNumber = pr.getTargetCurrencyIdCol();
-        this.rateColumnNumber = pr.getRateCol();
+        this.pr = pr;
         this.currenciesDbConnector = currenciesDbConnector;
     }
 
@@ -43,26 +34,24 @@ public class ExchangeRatesDbConnector {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "SELECT * FROM " + tableName + " WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
+                String sql = "SELECT * FROM " + pr.getExchangeRatesTableName() + " WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, baseCurrencyId);
                     ps.setInt(2, targetCurrencyId);
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
-                            int id = rs.getInt(idColumnNumber);
+                            int id = rs.getInt(pr.getExchangeRatesIdCol());
 
-                            BigDecimal rate = rs.getBigDecimal(rateColumnNumber);
+                            BigDecimal rate = rs.getBigDecimal(pr.getRateCol());
                             return new ExchangeRate(id, baseCurrencyId, targetCurrencyId, rate);
                         }
                     } catch (SQLException e) {
-                        System.out.println("selectRate SQLException: " + e);
-                        System.err.println(e);
+                        log.info("selectRate SQLException: " + e);
                     }
                 }
             }
         } catch (Exception ex) {
-            System.out.println("selectRate exception: " + ex);
-            System.err.println(ex);
+            log.info("selectRate exception: " + ex);
         }
         return null;
     }
@@ -71,7 +60,7 @@ public class ExchangeRatesDbConnector {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "UPDATE " + tableName + " SET RATE = ? WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
+                String sql = "UPDATE " + pr.getExchangeRatesTableName() + " SET RATE = ? WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setBigDecimal(1, newRate);
                     ps.setInt(2, baseCurrencyId);
@@ -84,8 +73,7 @@ public class ExchangeRatesDbConnector {
             }
             return findRate(baseCurrencyId, targetCurrencyId);
         } catch (Exception e) {
-            System.out.println("update exception: " + e);
-            System.err.println(e);
+            log.info("update exception: " + e);
             return null;
         }
     }
@@ -97,13 +85,13 @@ public class ExchangeRatesDbConnector {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DBSource.get().getConnection()) {
 
-                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getExchangeRatesTableName())) {
                     try (ResultSet resultSet = ps.executeQuery()) {
                         while (resultSet.next()) {
-                            int id = resultSet.getInt(idColumnNumber);
-                            int baseCurrency = resultSet.getInt(baseCurrencyIdColumnNumber);
-                            int targetCurrency = resultSet.getInt(targetCurrencyIdColumnNumber);
-                            BigDecimal rate = resultSet.getBigDecimal(rateColumnNumber);
+                            int id = resultSet.getInt(pr.getExchangeRatesIdCol());
+                            int baseCurrency = resultSet.getInt(pr.getBaseCurrencyIdCol());
+                            int targetCurrency = resultSet.getInt(pr.getTargetCurrencyIdCol());
+                            BigDecimal rate = resultSet.getBigDecimal(pr.getRateCol());
                             ExchangeRate exchangeRate = new ExchangeRate(id, baseCurrency, targetCurrency, rate);
                             exchangeRates.add(exchangeRate);
                         }
@@ -111,7 +99,7 @@ public class ExchangeRatesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex);
+            log.info(String.valueOf(ex));
         }
         return exchangeRates;
     }
@@ -126,8 +114,7 @@ public class ExchangeRatesDbConnector {
             if (targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency code provided");
 
         } catch (Exception e) {
-            System.out.println("Currency seeking exception on insert: " + e);
-            System.err.println(e);
+            log.info("Currency seeking exception on insert: " + e);
         }
         ExchangeRate exchangeRate = this.insert(baseCurrency.getId(), targetCurrency.getId(), rate);
         return exchangeRate;
@@ -138,7 +125,7 @@ public class ExchangeRatesDbConnector {
         try {
             Class.forName("oracle.jdbc.OracleDriver").getDeclaredConstructor().newInstance();
             try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "INSERT INTO " + tableName + " (BASECURRENCYID, TARGETCURRENCYID, RATE) VALUES (?, ?, ?)";
+                String sql = "INSERT INTO " + pr.getExchangeRatesTableName() + " (BASECURRENCYID, TARGETCURRENCYID, RATE) VALUES (?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, baseCurrencyCode);
                     ps.setInt(2, targetCurrencyCode);
@@ -148,8 +135,7 @@ public class ExchangeRatesDbConnector {
             }
             exchangeRate = this.findRate(currenciesDbConnector.findById(baseCurrencyCode).getId(), currenciesDbConnector.findById(targetCurrencyCode).getId());
         } catch (Exception e) {
-            System.out.println("insert exception: " + e);
-            System.err.println(e);
+            log.info("insert exception: " + e);
         }
         return exchangeRate;
     }

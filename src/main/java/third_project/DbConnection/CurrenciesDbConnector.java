@@ -14,21 +14,13 @@ import java.util.logging.Logger;
 public class CurrenciesDbConnector {
 
     private static final Logger log = Logger.getLogger("com.example");
-
     private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
-    private final int idColumnNumber;
-    private final int codeColumnNumber;
-    private final int fullNameColumnNumber;
-    private final int signColumnNumber;
-    private final String tableName;
+    private final PropertiesReader pr;
 
 
     public CurrenciesDbConnector(PropertiesReader pr) {
-        this.tableName = pr.getCurrenciesTableName();
-        this.idColumnNumber = pr.getCurrenciesIdCol();
-        this.codeColumnNumber = pr.getCurrenciesCodeCol();
-        this.fullNameColumnNumber = pr.getCurrenciesFullNameCol();
-        this.signColumnNumber = pr.getCurrenciesSignCol();
+        this.pr = pr;
+
     }
 
     public Currency insert(String code, String name, String sign) {
@@ -37,7 +29,7 @@ public class CurrenciesDbConnector {
 
             try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "INSERT INTO " + tableName + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
+                String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setString(1, code.toUpperCase());
                     preparedStatement.setString(2, sign);
@@ -59,7 +51,7 @@ public class CurrenciesDbConnector {
 
             try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "UPDATE " + tableName + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
+                String sql = "UPDATE " + pr.getCurrenciesTableName() + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setString(1, currency.getCode().toUpperCase());
                     preparedStatement.setString(2, currency.getSign());
@@ -82,7 +74,7 @@ public class CurrenciesDbConnector {
 
             try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "DELETE FROM " + tableName + " WHERE id = ?";
+                String sql = "DELETE FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
 
@@ -101,14 +93,14 @@ public class CurrenciesDbConnector {
         try {
 
             try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "SELECT * FROM " + tableName + " WHERE CODE = ?";
+                String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setString(1, code.toUpperCase());
                     try (ResultSet resultSet = preparedStatement.executeQuery()) {
                         if (resultSet.next()) {
-                            int id = resultSet.getInt(idColumnNumber);
-                            String fullName = resultSet.getString(fullNameColumnNumber);
-                            String sign = resultSet.getString(signColumnNumber);
+                            int id = resultSet.getInt(pr.getCurrenciesIdCol());
+                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
                             currency = new Currency(id, code.toUpperCase(), fullName, sign);
                         }
                     }
@@ -128,14 +120,14 @@ public class CurrenciesDbConnector {
         try {
 
             try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
+                String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
                 try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
                     try (ResultSet resultSet = preparedStatement.executeQuery()) {
                         if (resultSet.next()) {
-                            String code = resultSet.getString(codeColumnNumber);
-                            String fullName = resultSet.getString(fullNameColumnNumber);
-                            String sign = resultSet.getString(signColumnNumber);
+                            String code = resultSet.getString(pr.getCurrenciesCodeCol());
+                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
                             currency = new Currency(id, code, fullName, sign);
                         }
                     }
@@ -156,13 +148,13 @@ public class CurrenciesDbConnector {
 
             try (Connection conn = DBSource.get().getConnection()) {
 
-                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName)) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName())) {
                     try (ResultSet resultSet = ps.executeQuery()) {
                         while (resultSet.next()) {
-                            int id = resultSet.getInt(idColumnNumber);
-                            String code = resultSet.getString(codeColumnNumber);
-                            String fullName = resultSet.getString(fullNameColumnNumber);
-                            String sign = resultSet.getString(signColumnNumber);
+                            int id = resultSet.getInt(pr.getCurrenciesIdCol());
+                            String code = resultSet.getString(pr.getCurrenciesCodeCol());
+                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
                             Currency currency = new Currency(id, code, fullName, sign);
                             currencies.add(currency);
                         }

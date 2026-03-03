@@ -13,12 +13,14 @@ import java.util.List;
 
 public final class Validation {
 
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger("com.example");
+
     public static boolean isStringValid(String str) {
         return str != null && !str.isEmpty();
     }
 
     public static boolean isStringConvertableToBigDecimal(String str) throws IllegalArgumentException {
-        System.out.println("string on validation" + " " + str);
+        log.info("string on validation" + " " + str);
         try {
             new BigDecimal(str);
             return true;

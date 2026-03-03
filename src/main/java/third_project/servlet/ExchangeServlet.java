@@ -90,7 +90,7 @@ public class ExchangeServlet extends BaseServlet {
         } catch (Exception e) {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage());
             log.info("Exchange servlet: Exception in doGet");
-            System.err.println(e);
+            log.info(String.valueOf(e));
             response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }

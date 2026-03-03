@@ -45,8 +45,7 @@ public class JUL_Logger implements ServletContextListener {
             appLogger.info("JUL logging initialized. Log file: " + logFile.getAbsolutePath());
 
         } catch (Exception e) {
-            System.err.println("Failed to init JUL logging: " + e.getMessage());
-            e.printStackTrace(System.err);
+            Logger.getLogger("com.example").log(Level.INFO, "Failed to init JUL logging", e);
         }
     }
 

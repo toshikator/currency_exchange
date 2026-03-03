@@ -142,7 +142,7 @@ public class ExchangeRatesServlet extends BaseServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("error by exchange rate servlet");
+            log.info("error by exchange rate servlet");
             log.info("ExchangeRatesServlet General exception(doPOST): " + e.getMessage());
             response.getWriter().println("error by exchange rate servlet" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
