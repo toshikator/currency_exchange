@@ -25,18 +25,17 @@ public class CurrenciesDbConnector {
 
     public Currency insert(String code, String name, String sign) {
 
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
+        try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
-                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(1, code.toUpperCase());
-                    preparedStatement.setString(2, sign);
-                    preparedStatement.setString(3, name);
-                    preparedStatement.executeUpdate();
-                    return findByCode(code);
-                }
+            String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setString(1, code.toUpperCase());
+                preparedStatement.setString(2, sign);
+                preparedStatement.setString(3, name);
+                preparedStatement.executeUpdate();
+                return findByCode(code);
+
             }
         } catch (Exception ex) {
             log.info("insert exception: " + ex);
@@ -47,20 +46,19 @@ public class CurrenciesDbConnector {
 
     public int update(Currency currency) {
 
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
+        try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "UPDATE " + pr.getCurrenciesTableName() + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
-                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(1, currency.getCode().toUpperCase());
-                    preparedStatement.setString(2, currency.getSign());
-                    preparedStatement.setString(3, currency.getFullName());
-                    preparedStatement.setInt(4, currency.getId());
+            String sql = "UPDATE " + pr.getCurrenciesTableName() + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setString(1, currency.getCode().toUpperCase());
+                preparedStatement.setString(2, currency.getSign());
+                preparedStatement.setString(3, currency.getFullName());
+                preparedStatement.setInt(4, currency.getId());
 
-                    return preparedStatement.executeUpdate();
-                }
+                return preparedStatement.executeUpdate();
             }
+
         } catch (Exception ex) {
             log.info("update exception: " + ex);
             log.info(String.valueOf(ex));
@@ -70,17 +68,16 @@ public class CurrenciesDbConnector {
 
     public int deleteById(int id) {
 
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
+        try (Connection conn = DBSource.get().getConnection()) {
 
-                String sql = "DELETE FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
-                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setInt(1, id);
+            String sql = "DELETE FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setInt(1, id);
 
-                    return preparedStatement.executeUpdate();
-                }
+                return preparedStatement.executeUpdate();
             }
+
         } catch (Exception ex) {
             log.info("delete exception: " + ex);
             log.info(String.valueOf(ex));
@@ -90,22 +87,22 @@ public class CurrenciesDbConnector {
 
     public Currency findByCode(String code) throws SQLException {
         Currency currency = null;
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?";
-                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setString(1, code.toUpperCase());
-                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            int id = resultSet.getInt(pr.getCurrenciesIdCol());
-                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                            currency = new Currency(id, code.toUpperCase(), fullName, sign);
-                        }
+
+        try (Connection conn = DBSource.get().getConnection()) {
+            String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setString(1, code.toUpperCase());
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int id = resultSet.getInt(pr.getCurrenciesIdCol());
+                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
+                        currency = new Currency(id, code.toUpperCase(), fullName, sign);
                     }
                 }
             }
+
         } catch (Exception ex) {
             log.info("Exception in selectOne by Currency Code");
             log.info("Currency code = " + code);
@@ -117,22 +114,22 @@ public class CurrenciesDbConnector {
 
     public Currency findById(int id) {
         Currency currency = null;
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
-                String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
-                try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                    preparedStatement.setInt(1, id);
-                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            String code = resultSet.getString(pr.getCurrenciesCodeCol());
-                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                            currency = new Currency(id, code, fullName, sign);
-                        }
+
+        try (Connection conn = DBSource.get().getConnection()) {
+            String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
+            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+                preparedStatement.setInt(1, id);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String code = resultSet.getString(pr.getCurrenciesCodeCol());
+                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
+                        currency = new Currency(id, code, fullName, sign);
                     }
                 }
             }
+
         } catch (Exception ex) {
             log.info("Exception in findById");
             log.info("Currency id = " + id);
@@ -144,22 +141,22 @@ public class CurrenciesDbConnector {
     public ArrayList<Currency> getAllCurrencies() {
 
         ArrayList<Currency> currencies = new ArrayList<Currency>();
-        try {
 
-            try (Connection conn = DBSource.get().getConnection()) {
 
-                try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName())) {
-                    try (ResultSet resultSet = ps.executeQuery()) {
-                        while (resultSet.next()) {
-                            int id = resultSet.getInt(pr.getCurrenciesIdCol());
-                            String code = resultSet.getString(pr.getCurrenciesCodeCol());
-                            String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                            String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                            Currency currency = new Currency(id, code, fullName, sign);
-                            currencies.add(currency);
-                        }
+        try (Connection conn = DBSource.get().getConnection()) {
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName())) {
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    while (resultSet.next()) {
+                        int id = resultSet.getInt(pr.getCurrenciesIdCol());
+                        String code = resultSet.getString(pr.getCurrenciesCodeCol());
+                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
+                        Currency currency = new Currency(id, code, fullName, sign);
+                        currencies.add(currency);
                     }
                 }
+
             }
         } catch (Exception ex) {
             log.info(String.valueOf(ex));
