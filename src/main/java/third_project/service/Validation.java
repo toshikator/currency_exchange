@@ -29,9 +29,6 @@ public final class Validation {
         }
     }
 
-    public static boolean isListValid(List currencies) {
-        return currencies != null && !currencies.isEmpty();
-    }
 
     public static boolean areThreeStringsValid(String name, String code, String sign) {
         return isStringValid(name) && isStringValid(code) && isStringValid(sign);

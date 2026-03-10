@@ -66,10 +66,7 @@ public class CurrenciesServlet extends BaseServlet {
         try {
             ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
-            if (!Validation.isListValid(currencies)) {
-                log.info("error by currencies servlet, cause: currencies list is null or empty");
-                throw new IllegalStateException("currencies list is null or empty");
-            }
+            
 
             mapper.writeValue(response.getWriter(), currencies);
             response.setStatus(HttpServletResponse.SC_OK);

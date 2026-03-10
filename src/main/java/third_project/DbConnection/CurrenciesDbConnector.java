@@ -39,45 +39,33 @@ public class CurrenciesDbConnector {
             }
         } catch (Exception ex) {
             log.info("insert exception: " + ex);
-            log.info(String.valueOf(ex));
         }
         return null;
     }
 
     public int update(Currency currency) {
-
-
         try (Connection conn = DBSource.get().getConnection()) {
-
             String sql = "UPDATE " + pr.getCurrenciesTableName() + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 preparedStatement.setString(1, currency.getCode().toUpperCase());
                 preparedStatement.setString(2, currency.getSign());
                 preparedStatement.setString(3, currency.getFullName());
                 preparedStatement.setInt(4, currency.getId());
-
                 return preparedStatement.executeUpdate();
             }
-
         } catch (Exception ex) {
             log.info("update exception: " + ex);
-            log.info(String.valueOf(ex));
         }
         return 0;
     }
 
     public int deleteById(int id) {
-
-
         try (Connection conn = DBSource.get().getConnection()) {
-
             String sql = "DELETE FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 preparedStatement.setInt(1, id);
-
                 return preparedStatement.executeUpdate();
             }
-
         } catch (Exception ex) {
             log.info("delete exception: " + ex);
             log.info(String.valueOf(ex));
@@ -102,7 +90,6 @@ public class CurrenciesDbConnector {
                     }
                 }
             }
-
         } catch (Exception ex) {
             log.info("Exception in selectOne by Currency Code");
             log.info("Currency code = " + code);
@@ -114,8 +101,6 @@ public class CurrenciesDbConnector {
 
     public Currency findById(int id) {
         Currency currency = null;
-
-
         try (Connection conn = DBSource.get().getConnection()) {
             String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -129,7 +114,6 @@ public class CurrenciesDbConnector {
                     }
                 }
             }
-
         } catch (Exception ex) {
             log.info("Exception in findById");
             log.info("Currency id = " + id);
@@ -139,12 +123,8 @@ public class CurrenciesDbConnector {
     }
 
     public ArrayList<Currency> getAllCurrencies() {
-
         ArrayList<Currency> currencies = new ArrayList<Currency>();
-
-
         try (Connection conn = DBSource.get().getConnection()) {
-
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName())) {
                 try (ResultSet resultSet = ps.executeQuery()) {
                     while (resultSet.next()) {
@@ -156,7 +136,6 @@ public class CurrenciesDbConnector {
                         currencies.add(currency);
                     }
                 }
-
             }
         } catch (Exception ex) {
             log.info(String.valueOf(ex));
