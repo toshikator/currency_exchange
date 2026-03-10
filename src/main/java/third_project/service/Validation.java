@@ -41,17 +41,31 @@ public final class Validation {
 
     public static boolean isPatchRequestValid(String requestBody) {
         if (requestBody == null || requestBody.length() < 7) return false;
-        String firstCode = requestBody.substring(1, 4).toUpperCase();
-        String secondCode = requestBody.substring(4, 7).toUpperCase();
-        if (firstCode.equals(secondCode)) return false;
-        return isValidCurrencyCode(firstCode) && isValidCurrencyCode(secondCode);
+        String firstCode = requireCurrencyCode(requestBody.substring(1, 4).toUpperCase());
+        String secondCode = requireCurrencyCode(requestBody.substring(4, 7).toUpperCase());
+        return !firstCode.equals(secondCode);
     }
 
-    public static boolean isValidCurrencyCode(String code) {
-        return code != null && code.length() == 3 && code.matches("[A-Z]{3}");
+    public static boolean isBlank(String str) {
+        return str == null || str.isBlank();
+    }
+
+    public static String requireCurrencyCode(String code) {
+
+        if (isBlank(code)) {
+            throw new IllegalArgumentException("Currency code is required");
+        }
+
+        String normalized = code.trim().toUpperCase();
+
+        if (!normalized.matches("[A-Z]{3}")) {
+            throw new IllegalArgumentException("Currency code must contain exactly 3 Latin letters");
+        }
+        return normalized;
     }
 
     public static boolean isCurrencyValid(Currency currency) {
+
         return currency != null && currency.getId() > 0 && currency.getCode() != null && currency.getFullName() != null && currency.getSign() != null;
     }
 
