@@ -25,7 +25,6 @@ public class CurrenciesDbConnector {
 
     public Currency insert(String code, String name, String sign) {
 
-
         try (Connection conn = DBSource.get().getConnection()) {
 
             String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
@@ -73,30 +72,25 @@ public class CurrenciesDbConnector {
         return 0;
     }
 
-    public Currency findByCode(String code) throws SQLException {
-        Currency currency = null;
-
-
-        try (Connection conn = DBSource.get().getConnection()) {
-            String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?";
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                preparedStatement.setString(1, code.toUpperCase());
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int id = resultSet.getInt(pr.getCurrenciesIdCol());
-                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                        currency = new Currency(id, code.toUpperCase(), fullName, sign);
-                    }
+    public Currency findByCode(String code) {
+        try (Connection conn = DBSource.get().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?")) {
+            ps.setString(1, code.toUpperCase());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt(pr.getCurrenciesIdCol());
+                    //                    String dbCode = rs.getString(pr.getCurrenciesCodeCol());
+                    String fullName = rs.getString(pr.getCurrenciesFullNameCol());
+                    String sign = rs.getString(pr.getCurrenciesSignCol());
+                    return new Currency(id, code.toUpperCase(), fullName, sign);
                 }
             }
         } catch (Exception ex) {
-            log.info("Exception in selectOne by Currency Code");
+            log.info("Exception in findByCode");
             log.info("Currency code = " + code);
             log.info(String.valueOf(ex));
-            throw new SQLException("Currency not found in the database");
         }
-        return currency;
+        return null;
     }
 
     public Currency findById(int id) {
