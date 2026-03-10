@@ -28,7 +28,7 @@ public class ShowDbServlet extends BaseServlet {
                 return;
             }
 
-            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_OK);
+            response.setStatus(HttpServletResponse.SC_OK);
             PrintWriter out = response.getWriter();
             out.println("<html><body>");
             out.println("<h2><a href='index.html'>Home</a></h2>");
@@ -38,7 +38,7 @@ public class ShowDbServlet extends BaseServlet {
             out.println("<h2><a href='index.html'>Home</a></h2>");
             out.println("</body></html>");
         } catch (Exception e) {
-            response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             try {
                 PrintWriter out = response.getWriter();
                 out.println("<html><body>");

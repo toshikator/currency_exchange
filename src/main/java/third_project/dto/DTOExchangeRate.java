@@ -18,22 +18,8 @@ public class DTOExchangeRate implements java.io.Serializable {
 
     public DTOExchangeRate(int id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
         this.id = id;
-        try {
-            this.baseCurrency = baseCurrency;
-            if (this.baseCurrency == null) {
-                Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid baseCurrency ID provided (null)");
-                throw new IllegalArgumentException("Invalid baseCurrency ID provided");
-            }
-            this.targetCurrency = targetCurrency;
-            if (this.targetCurrency == null) {
-                Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid targetCurrency ID provided (null)");
-                throw new IllegalArgumentException("Invalid targetCurrency ID provided");
-            }
-
-        } catch (IllegalArgumentException e) {
-            Logger.getLogger("com.example").warning("DTOExchangeRate: Invalid currency ID provided");
-            throw new IllegalArgumentException("Invalid currency ID provided", e);
-        }
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
         this.rate = rate;
     }
 

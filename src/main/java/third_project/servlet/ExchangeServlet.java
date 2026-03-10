@@ -42,7 +42,7 @@ public class ExchangeServlet extends BaseServlet {
             String to = request.getParameter("to");
             String amountStr = request.getParameter("amount");
             BigDecimal amount = new BigDecimal(amountStr);
-            log.info("DOGET parameters ExchangeServlet doGET: from: " + from + " to: " + to + " amount: " + amount);
+            //            log.info("DOGET parameters ExchangeServlet doGET: from: " + from + " to: " + to + " amount: " + amount);
 
             if (currenciesDbConnector.findByCode(from) == null) {
                 log.warning("ExchangeServlet: base currency not found: from=" + from);
@@ -54,22 +54,25 @@ public class ExchangeServlet extends BaseServlet {
             }
             ExchangeRate rate;
             DTOExchange result;
-            if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode(to).getId()))) {
-                rate = exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode(to).getId());
+            if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(),
+                    currenciesDbConnector.findByCode(to).getId()))) {
+                rate = exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(),
+                        currenciesDbConnector.findByCode(to).getId());
                 BigDecimal convertedAmount = amount.multiply(rate.getRate());
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
-                result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
-                log.info(result.toString());
-                response.getWriter().write(result.toString());
-                response.setStatus(HttpServletResponse.SC_OK);
+                result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to),
+                        rate.getRate(), amount, convertedAmount);
+                //                log.info(result.toString());
+                //                response.getWriter().write(result.toString());
+                //                response.setStatus(HttpServletResponse.SC_OK);
             } else if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId()))) {
                 rate = exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(to).getId(), currenciesDbConnector.findByCode(from).getId());
                 BigDecimal convertedAmount = amount.multiply(new BigDecimal(1).divide(rate.getRate(), 6, RoundingMode.HALF_UP));
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), rate.getRate(), amount, convertedAmount);
-                log.info(result.toString());
-                response.getWriter().write(result.toString());
-                response.setStatus(HttpServletResponse.SC_OK);
+                //                log.info(result.toString());
+                //                response.getWriter().write(result.toString());
+                //                response.setStatus(HttpServletResponse.SC_OK);
             } else if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId())) &&
                     (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD").getId(), currenciesDbConnector.findByCode(to).getId())))) {
                 ExchangeRate firstRate = exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode(from).getId(), currenciesDbConnector.findByCode("USD").getId());
@@ -77,15 +80,15 @@ public class ExchangeServlet extends BaseServlet {
                 BigDecimal convertedAmount = amount.multiply(firstRate.getRate()).divide(secondRate.getRate(), 6, RoundingMode.HALF_UP);
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
-                log.info(result.toString());
-                log.info("exchange result: " + result);
-                response.getWriter().write(result.toString());
-                response.setStatus(HttpServletResponse.SC_OK);
+                //                log.info(result.toString());
+                //                log.info("exchange result: " + result);
+                //                response.getWriter().write(result.toString());
+                //                response.setStatus(HttpServletResponse.SC_OK);
 
             } else {
                 throw new Exception("Exchange servlet: no currency exchange rate");
             }
-
+            writeJson(response, HttpServletResponse.SC_OK, result);
 
         } catch (Exception e) {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage());

@@ -35,7 +35,7 @@ public class ExchangeRatesServlet extends BaseServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            //            ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
@@ -48,9 +48,10 @@ public class ExchangeRatesServlet extends BaseServlet {
                 log.info("empty dataset of DTOs");
                 throw new IllegalStateException("empty dataset of DTOs");
             }
-
-            mapper.writeValue(response.getWriter(), exchangeRates);
-            response.setStatus(HttpServletResponse.SC_OK);
+            //
+            //            objectMapper.writeValue(response.getWriter(), exchangeRates);
+            //            response.setStatus(HttpServletResponse.SC_OK);
+            writeJson(response, HttpServletResponse.SC_OK, exchangeRates);
         } catch (IllegalStateException e) {
             log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage());
             response.getWriter().println("empty dataset of DTOs");
@@ -72,10 +73,14 @@ public class ExchangeRatesServlet extends BaseServlet {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             String rateParam = request.getParameter("rate");
-            log.info("ExchangeRatesServlet doPost parameters: " + Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
+            //            log.info("ExchangeRatesServlet doPost parameters: " + Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
 
-            if (!Validation.areThreeStringsValid(baseCurrencyCode, targetCurrencyCode, rateParam)) {
-                log.warning("ExchangeRatesServlet: invalid parameters: base=" + baseCurrencyCode + ", target=" + targetCurrencyCode + ", rate=" + rateParam);
+            if (!Validation.isStringValid(baseCurrencyCode)
+                    && !Validation.isStringValid(targetCurrencyCode)
+                    && !Validation.isStringConvertableToBigDecimal(rateParam)) {
+                log.warning("ExchangeRatesServlet: invalid parameters: base=" +
+                        baseCurrencyCode + ", " +
+                        "target=" + targetCurrencyCode + ", rate=" + rateParam);
                 throw new IllegalStateException("invalid parameters");
             }
 
@@ -115,9 +120,10 @@ public class ExchangeRatesServlet extends BaseServlet {
             }
 
             DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency, targetCurrency, rate);
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(response.getWriter(), dto);
-            response.setStatus(HttpServletResponse.SC_CREATED);
+
+            //            objectMapper.writeValue(response.getWriter(), dto);
+            //            response.setStatus(HttpServletResponse.SC_CREATED);
+            writeJson(response, HttpServletResponse.SC_CREATED, dto);
         } catch (NumberFormatException nfe) {
             log.info("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());

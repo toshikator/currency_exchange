@@ -12,6 +12,7 @@ import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
+import third_project.service.PatchBodyParser;
 import third_project.service.Validation;
 
 
@@ -36,8 +37,7 @@ public class ExchangeRateServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+
 
         try {
             String pathInfo = request.getPathInfo();
@@ -55,9 +55,11 @@ public class ExchangeRateServlet extends BaseServlet {
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            DTOExchangeRate dto = new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP));
 
-            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP))));
-            response.setStatus(HttpServletResponse.SC_OK);
+            //            response.getWriter().println(new ObjectMapper().writeValueAsString(dto));
+            //            response.setStatus(HttpServletResponse.SC_OK);
+            writeJson(response, HttpServletResponse.SC_OK, dto);
         } catch (NullPointerException e) {
             log.info("ExchangeRate servlet NullPointerException(doGET_1): " + e.getMessage());
 
@@ -89,7 +91,7 @@ public class ExchangeRateServlet extends BaseServlet {
             String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
             log.info("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode);
 
-            third_project.service.PatchBodyParser.ParsedBody parsedBody = third_project.service.PatchBodyParser.parse(request);
+            PatchBodyParser.ParsedBody parsedBody = PatchBodyParser.parse(request);
 
             String rateParam = request.getParameter("rate");
             if (rateParam == null || rateParam.isBlank()) {
@@ -134,8 +136,11 @@ public class ExchangeRateServlet extends BaseServlet {
             }
             log.info("ExchangeRate updated:" + updated);
             log.info("CurrencyExchange rate updated:" + updated);
-            response.getWriter().println(new ObjectMapper().writeValueAsString(new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP))));
-            response.setStatus(HttpServletResponse.SC_OK);
+            DTOExchangeRate dto = new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP));
+            //            response.getWriter().println(new ObjectMapper().writeValueAsString(dto));
+            //            response.setStatus(HttpServletResponse.SC_OK);
+            writeJson(response, HttpServletResponse.SC_OK, dto);
+
         } catch (IllegalArgumentException e) {
             log.info(e.getMessage());
             log.info("ExchangeRate servlet IllegalArgumentException(doPATCH): " + e.getMessage());

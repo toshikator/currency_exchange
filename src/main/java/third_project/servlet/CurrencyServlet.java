@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 @WebServlet(name = "currency", value = "/currency/*")
 public class CurrencyServlet extends BaseServlet {
-    
+
 
     public CurrencyServlet() {
         super();
@@ -40,9 +40,10 @@ public class CurrencyServlet extends BaseServlet {
                 log.warning("CurrencyServlet: Currency not found for pathInfo=" + pathInfo);
                 throw new ServletException("Currency not found");
             }
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(response.getWriter(), currency);
-            response.setStatus(HttpServletResponse.SC_OK);
+
+            //            objectMapper.writeValue(response.getWriter(), currency);
+            //            response.setStatus(HttpServletResponse.SC_OK);
+            writeJson(response, HttpServletResponse.SC_OK, currency);
 
         } catch (IllegalArgumentException e) {
             log.info("invalid pathInfo");

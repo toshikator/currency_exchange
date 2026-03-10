@@ -41,9 +41,10 @@ public class CurrenciesServlet extends BaseServlet {
                 throw new IllegalStateException("Currency with such code already exists");
             }
             Currency currency = currenciesDbConnector.insert(code, name, sign);
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(response.getWriter(), currency);
-            response.setStatus(HttpServletResponse.SC_CREATED);
+
+            //            objectMapper.writeValue(response.getWriter(), currency);
+            //            response.setStatus(HttpServletResponse.SC_CREATED);
+            writeJson(response, HttpServletResponse.SC_CREATED, currency);
         } catch (IllegalArgumentException e) {
 
             log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
@@ -64,12 +65,13 @@ public class CurrenciesServlet extends BaseServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            //            ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
-            
 
-            mapper.writeValue(response.getWriter(), currencies);
-            response.setStatus(HttpServletResponse.SC_OK);
+
+            //            objectMapper.writeValue(response.getWriter(), currencies);
+            //            response.setStatus(HttpServletResponse.SC_OK);
+            writeJson(response, HttpServletResponse.SC_OK, currencies);
         } catch (Exception e) {
 
             log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());

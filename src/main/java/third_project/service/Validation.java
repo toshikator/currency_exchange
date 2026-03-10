@@ -16,16 +16,17 @@ public final class Validation {
     private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger("com.example");
 
     public static boolean isStringValid(String str) {
-        return str != null && !str.isEmpty();
+
+        return str != null && !str.isBlank() && str.matches("[A-Z]{11}");
     }
 
-    public static boolean isStringConvertableToBigDecimal(String str) throws IllegalArgumentException {
-        log.info("string on validation" + " " + str);
+    public static boolean isStringConvertableToBigDecimal(String str) {
+        //        log.info("string on validation" + " " + str);
         try {
             new BigDecimal(str);
             return true;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format");
+            return false;
         }
     }
 
