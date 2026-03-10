@@ -24,20 +24,26 @@ public class CurrenciesDbConnector {
     }
 
     public Currency insert(String code, String name, String sign) {
-
-        try (Connection conn = DBSource.get().getConnection()) {
-
-            String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) Values (?, ?, ?)";
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                preparedStatement.setString(1, code.toUpperCase());
-                preparedStatement.setString(2, sign);
-                preparedStatement.setString(3, name);
-                preparedStatement.executeUpdate();
-                return findByCode(code);
-
+        String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) VALUES (?, ?, ?)";
+        try (Connection conn = DBSource.get().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, code.toUpperCase());
+            ps.setString(2, sign);
+            ps.setString(3, name);
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                return null;
             }
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int id = keys.getInt(1);
+                    return new Currency(id, code.toUpperCase(), name, sign);
+                }
+            }
+
+            return findByCode(code);
         } catch (Exception ex) {
-            log.info("insert exception: " + ex);
+            log.log(Level.INFO, "insert exception: " + ex, ex);
         }
         return null;
     }
