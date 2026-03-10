@@ -100,18 +100,15 @@ public class CurrenciesDbConnector {
     }
 
     public Currency findById(int id) {
-        Currency currency = null;
-        try (Connection conn = DBSource.get().getConnection()) {
-            String sql = "SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?";
-            try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-                preparedStatement.setInt(1, id);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        String code = resultSet.getString(pr.getCurrenciesCodeCol());
-                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                        currency = new Currency(id, code, fullName, sign);
-                    }
+        try (Connection conn = DBSource.get().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String code = rs.getString(pr.getCurrenciesCodeCol());
+                    String fullName = rs.getString(pr.getCurrenciesFullNameCol());
+                    String sign = rs.getString(pr.getCurrenciesSignCol());
+                    return new Currency(id, code, fullName, sign);
                 }
             }
         } catch (Exception ex) {
@@ -119,7 +116,7 @@ public class CurrenciesDbConnector {
             log.info("Currency id = " + id);
             log.info(String.valueOf(ex));
         }
-        return currency;
+        return null;
     }
 
     public ArrayList<Currency> getAllCurrencies() {
