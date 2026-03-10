@@ -124,18 +124,17 @@ public class CurrenciesDbConnector {
 
     public ArrayList<Currency> getAllCurrencies() {
         ArrayList<Currency> currencies = new ArrayList<Currency>();
-        try (Connection conn = DBSource.get().getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName())) {
-                try (ResultSet resultSet = ps.executeQuery()) {
-                    while (resultSet.next()) {
-                        int id = resultSet.getInt(pr.getCurrenciesIdCol());
-                        String code = resultSet.getString(pr.getCurrenciesCodeCol());
-                        String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
-                        String sign = resultSet.getString(pr.getCurrenciesSignCol());
-                        Currency currency = new Currency(id, code, fullName, sign);
-                        currencies.add(currency);
-                    }
-                }
+        try (Connection conn = DBSource.get().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName());
+             ResultSet resultSet = ps.executeQuery()
+        ) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt(pr.getCurrenciesIdCol());
+                String code = resultSet.getString(pr.getCurrenciesCodeCol());
+                String fullName = resultSet.getString(pr.getCurrenciesFullNameCol());
+                String sign = resultSet.getString(pr.getCurrenciesSignCol());
+                Currency currency = new Currency(id, code, fullName, sign);
+                currencies.add(currency);
             }
         } catch (Exception ex) {
             log.info(String.valueOf(ex));
