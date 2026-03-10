@@ -47,16 +47,13 @@ public class CurrenciesServlet extends BaseServlet {
         } catch (IllegalArgumentException e) {
 
             log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
-            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
 
             log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage());
-            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
 
-            e.printStackTrace();
             log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -78,7 +75,6 @@ public class CurrenciesServlet extends BaseServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
 
-            e.printStackTrace();
             log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

@@ -47,14 +47,11 @@ public class CurrencyServlet extends BaseServlet {
         } catch (IllegalArgumentException e) {
             log.info("invalid pathInfo");
             log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage());
-            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (ServletException e) {
-            e.printStackTrace();
             log.info("Currency servlet ServletException(Currency not found): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
             log.info("Currency servlet unexpected Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

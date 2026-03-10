@@ -55,13 +55,11 @@ public class ExchangeRatesServlet extends BaseServlet {
             log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage());
             log.info("empty dataset of DTOs");
             response.getWriter().println("empty dataset of DTOs");
-            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
             log.info("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage());
             log.info("servlet global error: " + e.getMessage());
-            e.printStackTrace();
             response.getWriter().println("servlet global error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -125,23 +123,19 @@ public class ExchangeRatesServlet extends BaseServlet {
         } catch (NumberFormatException nfe) {
             log.info("rate must be a number");
             response.getWriter().println("rate must be a number" + nfe.getMessage());
-            nfe.printStackTrace();
             log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): " + nfe.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             response.getWriter().println("invalid currency" + e.getMessage());
             log.info("invalid currency code");
             log.info("ExchangeRatesServlet IllegalArgumentException exception(doPOST): " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
-            e.printStackTrace();
             log.info("invalid parameters");
             log.info("ExchangeRatesServlet IllegalStateException exception(doPOST): " + e.getMessage());
             response.getWriter().println("invalid parameters" + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
             log.info("error by exchange rate servlet");
             log.info("ExchangeRatesServlet General exception(doPOST): " + e.getMessage());
             response.getWriter().println("error by exchange rate servlet" + e.getMessage());
