@@ -45,11 +45,11 @@ public class ExchangeServlet extends BaseServlet {
             //            log.info("DOGET parameters ExchangeServlet doGET: from: " + from + " to: " + to + " amount: " + amount);
 
             if (currenciesDbConnector.findByCode(from) == null) {
-                log.warning("ExchangeServlet: base currency not found: from=" + from);
+                log.warning("ExchangeServlet: base currency not found: from=" + from + " [File: ExchangeServlet.java]");
                 throw new IllegalArgumentException("base currency not found");
             }
             if (currenciesDbConnector.findByCode(to) == null) {
-                log.warning("ExchangeServlet: target currency not found: to=" + to);
+                log.warning("ExchangeServlet: target currency not found: to=" + to + " [File: ExchangeServlet.java]");
                 throw new IllegalArgumentException("target currency not found");
             }
             ExchangeRate rate;
@@ -91,9 +91,9 @@ public class ExchangeServlet extends BaseServlet {
             writeJson(response, HttpServletResponse.SC_OK, result);
 
         } catch (Exception e) {
-            log.info("ExchangeServlet Exception(doGET) :" + e.getMessage());
-            log.info("Exchange servlet: Exception in doGet");
-            log.info(String.valueOf(e));
+            log.info("ExchangeServlet Exception(doGET) :" + e.getMessage() + " [File: ExchangeServlet.java]");
+            log.info("Exchange servlet: Exception in doGet [File: ExchangeServlet.java]");
+            log.info(String.valueOf(e) + " [File: ExchangeServlet.java]");
             response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }

@@ -33,11 +33,11 @@ public class CurrenciesServlet extends BaseServlet {
             String sign = request.getParameter("sign");
 
             if (!Validation.areThreeStringsValid(name, code, sign)) {
-                log.info("invalid parameters");
+                log.info("invalid parameters [File: CurrenciesServlet.java]");
                 throw new IllegalArgumentException("Invalid parameters");
             }
             if (currenciesDbConnector.findByCode(code) != null) {
-                log.info("currency with such code already exists");
+                log.info("currency with such code already exists [File: CurrenciesServlet.java]");
                 throw new IllegalStateException("Currency with such code already exists");
             }
             Currency currency = currenciesDbConnector.insert(code, name, sign);
@@ -46,16 +46,16 @@ public class CurrenciesServlet extends BaseServlet {
             //            response.setStatus(HttpServletResponse.SC_CREATED);
             writeJson(response, HttpServletResponse.SC_CREATED, currency);
         } catch (IllegalArgumentException e) {
-
-            log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage());
+            
+            log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage() + " [File: CurrenciesServlet.java]");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
-
-            log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage());
+            
+            log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage() + " [File: CurrenciesServlet.java]");
             response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
-
-            log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage());
+            
+            log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage() + " [File: CurrenciesServlet.java]");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -73,8 +73,8 @@ public class CurrenciesServlet extends BaseServlet {
             //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, currencies);
         } catch (Exception e) {
-
-            log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage());
+            
+            log.info("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage() + " [File: CurrenciesServlet.java]");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

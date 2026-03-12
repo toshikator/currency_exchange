@@ -45,12 +45,12 @@ public class ExchangeRatesDbConnector {
                         return new ExchangeRate(id, baseCurrencyId, targetCurrencyId, rate);
                     }
                 } catch (SQLException e) {
-                    log.info("selectRate SQLException: " + e);
+                    log.info("selectRate SQLException: " + e + " [File: ExchangeRatesDbConnector.java]");
                 }
             }
 
         } catch (Exception ex) {
-            log.info("selectRate exception: " + ex);
+            log.info("selectRate exception: " + ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return null;
     }
@@ -71,7 +71,7 @@ public class ExchangeRatesDbConnector {
             }
             return findRate(baseCurrencyId, targetCurrencyId);
         } catch (Exception e) {
-            log.info("update exception: " + e);
+            log.info("update exception: " + e + " [File: ExchangeRatesDbConnector.java]");
             return null;
         }
     }
@@ -96,7 +96,7 @@ public class ExchangeRatesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info(String.valueOf(ex));
+            log.info(String.valueOf(ex) + " [File: ExchangeRatesDbConnector.java]");
         }
         return exchangeRates;
     }
@@ -111,7 +111,7 @@ public class ExchangeRatesDbConnector {
             if (targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency code provided");
 
         } catch (Exception e) {
-            log.info("Currency seeking exception on insert: " + e);
+            log.info("Currency seeking exception on insert: " + e + " [File: ExchangeRatesDbConnector.java]");
         }
         ExchangeRate exchangeRate = this.insert(baseCurrency.getId(), targetCurrency.getId(), rate);
         return exchangeRate;
@@ -131,7 +131,7 @@ public class ExchangeRatesDbConnector {
 
             exchangeRate = this.findRate(currenciesDbConnector.findById(baseCurrencyCode).getId(), currenciesDbConnector.findById(targetCurrencyCode).getId());
         } catch (Exception e) {
-            log.info("insert exception: " + e);
+            log.info("insert exception: " + e + " [File: ExchangeRatesDbConnector.java]");
         }
         return exchangeRate;
     }

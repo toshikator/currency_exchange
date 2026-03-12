@@ -21,7 +21,7 @@ public final class HikariPool {
 
     private HikariPool(PropertiesReader pr) {
         try {
-            log.info("Initializing HikariCP pool...");
+            log.info("Initializing HikariCP pool... [File: HikariPool.java]");
             String address = pr.getAddress();
             String port = pr.getPort();
             String databaseName = pr.getDatabaseName();
@@ -50,7 +50,7 @@ public final class HikariPool {
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    log.info("Shutting down HikariCP pool...");
+                    log.info("Shutting down HikariCP pool... [File: HikariPool.java]");
                     HikariPool.shutdown();
                 } catch (Throwable t) {
                     log.log(Level.SEVERE, "Error while shutting down HikariCP", t);
@@ -94,7 +94,7 @@ public final class HikariPool {
             }
         }
         // Do not log sensitive data like credentials.
-        log.info("HikariPool is ready (DataSource initialized).");
+        log.info("HikariPool is ready (DataSource initialized). [File: HikariPool.java]");
         return local.ds;
     }
 

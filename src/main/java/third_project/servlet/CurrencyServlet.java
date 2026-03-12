@@ -30,14 +30,14 @@ public class CurrencyServlet extends BaseServlet {
         try {
             String pathInfo = request.getPathInfo();
             if (!Validation.isStringValid(pathInfo)) {
-                log.warning("CurrencyServlet: Invalid pathInfo: " + pathInfo);
+                log.warning("CurrencyServlet: Invalid pathInfo: " + pathInfo + " [File: CurrencyServlet.java]");
                 throw new IllegalArgumentException("Invalid pathInfo");
             }
             Currency currency;
 
             currency = Validation.isCurrencyExist(request.getPathInfo().substring(1), currenciesDbConnector) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
             if (currency == null) {
-                log.warning("CurrencyServlet: Currency not found for pathInfo=" + pathInfo);
+                log.warning("CurrencyServlet: Currency not found for pathInfo=" + pathInfo + " [File: CurrencyServlet.java]");
                 throw new ServletException("Currency not found");
             }
 
@@ -46,14 +46,14 @@ public class CurrencyServlet extends BaseServlet {
             writeJson(response, HttpServletResponse.SC_OK, currency);
 
         } catch (IllegalArgumentException e) {
-            log.info("invalid pathInfo");
-            log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage());
+            log.info("invalid pathInfo [File: CurrencyServlet.java]");
+            log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage() + " [File: CurrencyServlet.java]");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (ServletException e) {
-            log.info("Currency servlet ServletException(Currency not found): " + e.getMessage());
+            log.info("Currency servlet ServletException(Currency not found): " + e.getMessage() + " [File: CurrencyServlet.java]");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (Exception e) {
-            log.info("Currency servlet unexpected Exception: " + e.getMessage());
+            log.info("Currency servlet unexpected Exception: " + e.getMessage() + " [File: CurrencyServlet.java]");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

@@ -30,7 +30,7 @@ public class BaseServlet extends jakarta.servlet.http.HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        log.info("ExchangeRateServlet init");
+        log.info("ExchangeRateServlet init [File: BaseServlet.java]");
         currenciesDbConnector = (CurrenciesDbConnector) getServletContext().getAttribute("currenciesDbConnector");
         if (currenciesDbConnector == null) {
             log.severe("currenciesDbConnector not found in ServletContext");

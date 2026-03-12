@@ -26,6 +26,7 @@ public final class Validation {
             new BigDecimal(str);
             return true;
         } catch (NumberFormatException e) {
+            log.warning("string on validation" + " " + str + " " + e.getMessage() + " [File: Validation.java]");
             return false;
         }
     }

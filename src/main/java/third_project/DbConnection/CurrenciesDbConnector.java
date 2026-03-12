@@ -59,7 +59,7 @@ public class CurrenciesDbConnector {
                 return preparedStatement.executeUpdate();
             }
         } catch (Exception ex) {
-            log.info("update exception: " + ex);
+            log.info("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
         }
         return 0;
     }
@@ -72,8 +72,8 @@ public class CurrenciesDbConnector {
                 return preparedStatement.executeUpdate();
             }
         } catch (Exception ex) {
-            log.info("delete exception: " + ex);
-            log.info(String.valueOf(ex));
+            log.info("delete exception: " + ex + " [File: CurrenciesDbConnector.java]");
+            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
         }
         return 0;
     }
@@ -92,9 +92,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info("Exception in findByCode");
-            log.info("Currency code = " + code);
-            log.info(String.valueOf(ex));
+            log.info("Exception in findByCode [File: CurrenciesDbConnector.java]");
+            log.info("Currency code = " + code + " [File: CurrenciesDbConnector.java]");
+            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }
@@ -112,9 +112,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info("Exception in findById");
-            log.info("Currency id = " + id);
-            log.info(String.valueOf(ex));
+            log.info("Exception in findById [File: CurrenciesDbConnector.java]");
+            log.info("Currency id = " + id + " [File: CurrenciesDbConnector.java]");
+            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }
@@ -134,7 +134,7 @@ public class CurrenciesDbConnector {
                 currencies.add(currency);
             }
         } catch (Exception ex) {
-            log.info(String.valueOf(ex));
+            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
         }
         return currencies;
     }
