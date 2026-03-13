@@ -77,7 +77,6 @@ public class CurrenciesDbConnector {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int id = rs.getInt(pr.getCurrenciesIdCol());
-                    //                    String dbCode = rs.getString(pr.getCurrenciesCodeCol());
                     String fullName = rs.getString(pr.getCurrenciesFullNameCol());
                     String sign = rs.getString(pr.getCurrenciesSignCol());
                     return new Currency(id, code.toUpperCase(), fullName, sign);

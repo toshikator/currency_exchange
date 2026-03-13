@@ -27,7 +27,6 @@ public final class PatchBodyParser {
             return new ParsedBody(body, Map.of(), Map.of());
         }
 
-        // Cut off ";charset=UTF-8" etc.
         int semicolonIndex = contentType.indexOf(';');
         if (semicolonIndex != -1) {
             contentType = contentType.substring(0, semicolonIndex).trim();
@@ -43,14 +42,10 @@ public final class PatchBodyParser {
                 return new ParsedBody(body, Map.of(), json);
             }
             default:
-                // Unsupported → return raw only
                 return new ParsedBody(body, Map.of(), Map.of());
         }
     }
 
-    /**
-     * Read raw request body as String.
-     */
     private static String readBody(HttpServletRequest request) throws IOException {
         try (BufferedReader reader = request.getReader();
              StringWriter writer = new StringWriter()) {

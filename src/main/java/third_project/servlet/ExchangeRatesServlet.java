@@ -32,10 +32,7 @@ public class ExchangeRatesServlet extends BaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        //        response.setContentType("application/json");
-        //        response.setCharacterEncoding("UTF-8");
         try {
-            //            ObjectMapper mapper = new ObjectMapper();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
@@ -48,14 +45,9 @@ public class ExchangeRatesServlet extends BaseServlet {
                 log.info("empty dataset of DTOs [File: ExchangeRatesServlet.java]");
                 throw new IllegalStateException("empty dataset of DTOs");
             }
-            //
-            //            objectMapper.writeValue(response.getWriter(), exchangeRates);
-            //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, exchangeRates);
         } catch (IllegalStateException e) {
             log.warning("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.getWriter().println("empty dataset of DTOs");
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "empty dataset of DTOs" + e.getMessage());
 
         } catch (Exception e) {

@@ -22,14 +22,11 @@ public class ContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
         try {
-            // Initialize PropertiesReader once and expose via context
             PropertiesReader propertiesReader = PropertiesReader.getInstance();
             ctx.setAttribute("propertiesReader", propertiesReader);
 
-            // Initialize and expose a shared DBSource (wraps pooled DataSource)
             DBSource.init(propertiesReader);
 
-            // Initialize and expose DAO/connector singletons
             CurrenciesDbConnector currenciesDbConnector = new CurrenciesDbConnector(propertiesReader);
             ctx.setAttribute("currenciesDbConnector", currenciesDbConnector);
 
@@ -37,7 +34,6 @@ public class ContextListener implements ServletContextListener {
             ctx.setAttribute("exchangeRatesDbConnector", exchangeRatesDbConnector);
         } catch (Throwable t) {
             log.log(Level.SEVERE, "Failed to initialize application context", t);
-            // Let the container see the failure with full cause
             throw new RuntimeException("Failed to initialize application context", t);
         }
     }

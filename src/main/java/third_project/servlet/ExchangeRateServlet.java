@@ -40,7 +40,6 @@ public class ExchangeRateServlet extends BaseServlet {
         try {
             String pathInfo = request.getPathInfo();
             if (pathInfo == null || pathInfo.length() < 7) {
-                //                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
                 return;
@@ -49,7 +48,6 @@ public class ExchangeRateServlet extends BaseServlet {
             String baseCurrencyCode = path.substring(0, 3).toUpperCase();
             String targetCurrencyCode = path.substring(3, 6).toUpperCase();
             if (baseCurrencyCode == null || targetCurrencyCode == null) {
-                //                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
                 return;
@@ -59,17 +57,12 @@ public class ExchangeRateServlet extends BaseServlet {
             ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             DTOExchangeRate dto = new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP));
 
-            //            response.getWriter().println(new ObjectMapper().writeValueAsString(dto));
-            //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, dto);
         } catch (NullPointerException e) {
             log.info("ExchangeRate servlet NullPointerException(doGET_1): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
-            //            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            //            log.info("loloL " + e + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             throw new ServletException("Error processing exchange rate request", e);
         }
@@ -78,9 +71,6 @@ public class ExchangeRateServlet extends BaseServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //        response.setContentType("application/json");
-        //        response.setCharacterEncoding("UTF-8");
-        //        log.info("ExchangeRate servlet doPATCH [File: ExchangeRateServlet.java]");
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
             log.info("pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
@@ -108,7 +98,6 @@ public class ExchangeRateServlet extends BaseServlet {
             }
             log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
             if (!Validation.isStringValid(rateParam)) {
-                //                log.info("String is invalid");
                 log.warning("ExchangeRateServlet: Invalid rate parameter: " + rateParam + " [File: ExchangeRateServlet.java]");
                 throw new IllegalArgumentException("Invalid rate parameter");
             }

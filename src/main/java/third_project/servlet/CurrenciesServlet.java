@@ -34,7 +34,6 @@ public class CurrenciesServlet extends BaseServlet {
 
             if (!Validation.areThreeStringsValid(name, code, sign)) {
                 log.warning("name = " + name + ", code = " + code + ", sign = " + sign + " [File: CurrenciesServlet.java]");
-                //                log.info("invalid parameters [File: CurrenciesServlet.java]");
                 throw new IllegalArgumentException("Invalid parameters");
             }
             if (currenciesDbConnector.findByCode(code) != null) {
@@ -43,42 +42,31 @@ public class CurrenciesServlet extends BaseServlet {
             }
             Currency currency = currenciesDbConnector.insert(code, name, sign);
 
-            //            objectMapper.writeValue(response.getWriter(), currency);
-            //            response.setStatus(HttpServletResponse.SC_CREATED);
             writeJson(response, HttpServletResponse.SC_CREATED, currency);
         } catch (IllegalArgumentException e) {
 
             log.info("CurrenciesServlet IllegalArgumentException(POST)(invalid parameters): " + e.getMessage() + " [File: CurrenciesServlet.java]");
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (IllegalStateException e) {
             log.info("CurrenciesServlet IllegalStateException(POST)(currency with such code already exists): " + e.getMessage() + " [File: CurrenciesServlet.java]");
             writeError(response, HttpServletResponse.SC_CONFLICT, "Currency with such code already exists");
-            //            response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (Exception e) {
 
             log.info("CurrenciesServlet unexpected(POST) Exception: " + e.getMessage() + " [File: CurrenciesServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //        response.setContentType("application/json");
-        //        response.setCharacterEncoding("UTF-8");
         try {
-            //            ObjectMapper mapper = new ObjectMapper();
             List<Currency> currencies = currenciesDbConnector.getAllCurrencies();
 
 
-            //            objectMapper.writeValue(response.getWriter(), currencies);
-            //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, currencies);
         } catch (Exception e) {
 
             log.warning("CurrenciesServlet unexpected(GET) Exception: " + e.getMessage() + " [File: CurrenciesServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }

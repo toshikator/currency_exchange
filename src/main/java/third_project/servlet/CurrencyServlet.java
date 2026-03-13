@@ -41,22 +41,16 @@ public class CurrencyServlet extends BaseServlet {
                 throw new ServletException("Currency not found");
             }
 
-            //            objectMapper.writeValue(response.getWriter(), currency);
-            //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, currency);
 
         } catch (IllegalArgumentException e) {
-            //            log.info("invalid pathInfo [File: CurrencyServlet.java]");
             log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage() + " [File: CurrencyServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
         } catch (ServletException e) {
             log.info("Currency servlet ServletException(Currency not found): " + e.getMessage() + " [File: CurrencyServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
         } catch (Exception e) {
             log.info("Currency servlet unexpected Exception: " + e.getMessage() + " [File: CurrencyServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
