@@ -92,10 +92,11 @@ public class ExchangeServlet extends BaseServlet {
 
         } catch (Exception e) {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage() + " [File: ExchangeServlet.java]");
-            log.info("Exchange servlet: Exception in doGet [File: ExchangeServlet.java]");
-            log.info(String.valueOf(e) + " [File: ExchangeServlet.java]");
-            response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            //            log.info("Exchange servlet: Exception in doGet [File: ExchangeServlet.java]");
+            //            log.info(String.valueOf(e) + " [File: ExchangeServlet.java]");
+            //            response.getWriter().write("{\"message\"" + ":" + "\" Валюта не найдена\"}");
+            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Currency not found or exchange rate not found or shit happened");
         }
 
 

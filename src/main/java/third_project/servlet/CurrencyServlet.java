@@ -46,15 +46,18 @@ public class CurrencyServlet extends BaseServlet {
             writeJson(response, HttpServletResponse.SC_OK, currency);
 
         } catch (IllegalArgumentException e) {
-            log.info("invalid pathInfo [File: CurrencyServlet.java]");
+            //            log.info("invalid pathInfo [File: CurrencyServlet.java]");
             log.info("Currency servlet IllegalArgumentException(invalid pathInfo): " + e.getMessage() + " [File: CurrencyServlet.java]");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
         } catch (ServletException e) {
             log.info("Currency servlet ServletException(Currency not found): " + e.getMessage() + " [File: CurrencyServlet.java]");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
         } catch (Exception e) {
             log.info("Currency servlet unexpected Exception: " + e.getMessage() + " [File: CurrencyServlet.java]");
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }
