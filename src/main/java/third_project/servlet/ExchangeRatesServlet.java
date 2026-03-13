@@ -53,12 +53,12 @@ public class ExchangeRatesServlet extends BaseServlet {
             //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, exchangeRates);
         } catch (IllegalStateException e) {
-            log.info("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
+            log.warning("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
             response.getWriter().println("empty dataset of DTOs");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
-            log.info("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
+            log.warning("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
             response.getWriter().println("servlet global error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

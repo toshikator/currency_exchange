@@ -30,20 +30,12 @@ public class CurrenciesDbConnector {
             ps.setString(1, code.toUpperCase());
             ps.setString(2, sign);
             ps.setString(3, name);
-            int affected = ps.executeUpdate();
-            if (affected == 0) {
-                return null;
-            }
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    int id = keys.getInt(1);
-                    return new Currency(id, code.toUpperCase(), name, sign);
-                }
-            }
+            ps.executeUpdate();
+
 
             return findByCode(code);
         } catch (Exception ex) {
-            log.log(Level.INFO, "insert exception: " + ex, ex);
+            log.warning("insert exception: " + ex + "File: CurrenciesDbConnector.java");
         }
         return null;
     }
@@ -59,7 +51,7 @@ public class CurrenciesDbConnector {
                 return preparedStatement.executeUpdate();
             }
         } catch (Exception ex) {
-            log.info("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
+            log.warning("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
         }
         return 0;
     }
@@ -72,8 +64,8 @@ public class CurrenciesDbConnector {
                 return preparedStatement.executeUpdate();
             }
         } catch (Exception ex) {
-            log.info("delete exception: " + ex + " [File: CurrenciesDbConnector.java]");
-            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
+            log.warning("delete exception: " + ex + " [File: CurrenciesDbConnector.java]");
+
         }
         return 0;
     }
@@ -92,9 +84,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info("Exception in findByCode [File: CurrenciesDbConnector.java]");
-            log.info("Currency code = " + code + " [File: CurrenciesDbConnector.java]");
-            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
+            //            log.info("Exception in findByCode [File: CurrenciesDbConnector.java]");
+            log.info("Exception in findByCode. Currency code = " + code + " [File: CurrenciesDbConnector.java] " + ex.getMessage());
+            //            log.info(ex + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }
@@ -112,9 +104,9 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info("Exception in findById [File: CurrenciesDbConnector.java]");
-            log.info("Currency id = " + id + " [File: CurrenciesDbConnector.java]");
-            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
+            log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
+            //            log.info("Currency id = " + id + " [File: CurrenciesDbConnector.java]");
+            //            log.info(ex + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }
@@ -134,7 +126,7 @@ public class CurrenciesDbConnector {
                 currencies.add(currency);
             }
         } catch (Exception ex) {
-            log.info(String.valueOf(ex) + " [File: CurrenciesDbConnector.java]");
+            log.info("Exception in getAllCurrencies" + ex + " [File: CurrenciesDbConnector.java]");
         }
         return currencies;
     }

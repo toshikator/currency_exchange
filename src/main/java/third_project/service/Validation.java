@@ -16,8 +16,8 @@ public final class Validation {
     private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger("com.example");
 
     public static boolean isStringValid(String str) {
-
-        return str != null && !str.isBlank() && str.matches("[A-Z]{11}");
+        String regex = "^(?!.*--)[A-Za-z0-9 !@#$%^&()_+=\\[\\]{}:,.?|-]{1,28}$";
+        return str != null && !str.isBlank() && str.matches(regex);
     }
 
     public static boolean isStringConvertableToBigDecimal(String str) {
@@ -33,6 +33,7 @@ public final class Validation {
 
 
     public static boolean areThreeStringsValid(String name, String code, String sign) {
+        //        log.info("name= " + isStringValid(name) + " code= " + isStringValid(code) + " sign= " + isStringValid(sign) + " Validation File, Three Strings");
         return isStringValid(name) && isStringValid(code) && isStringValid(sign);
     }
 

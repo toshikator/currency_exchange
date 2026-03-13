@@ -17,9 +17,9 @@ public class BaseServlet extends jakarta.servlet.http.HttpServlet {
     protected ExchangeRatesDbConnector exchangeRatesDbConnector;
 
     protected void writeJson(HttpServletResponse response, int status, Object body) throws IOException {
-        response.setStatus(status);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setStatus(status);
         objectMapper.writeValue(response.getWriter(), body);
     }
 
