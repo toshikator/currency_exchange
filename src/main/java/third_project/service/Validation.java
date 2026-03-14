@@ -39,9 +39,9 @@ public final class Validation {
     }
 
     public static boolean isPatchRequestValid(String requestBody) {
-        if (requestBody == null || requestBody.length() < 7) return false;
-        String firstCode = requireCurrencyCode(requestBody.substring(1, 4).toUpperCase());
-        String secondCode = requireCurrencyCode(requestBody.substring(4, 7).toUpperCase());
+        if (requestBody == null || requestBody.trim().length() != 7 || !isStringValid(requestBody)) return false;
+        String firstCode = requestBody.trim().substring(1, 4).toUpperCase();
+        String secondCode = requestBody.trim().substring(4, 7).toUpperCase();
         return !firstCode.equals(secondCode);
     }
 
