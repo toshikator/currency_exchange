@@ -38,13 +38,19 @@ public class ExchangeRateServlet extends BaseServlet {
             String targetCurrencyCode = path.substring(3, 6).toUpperCase();
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
+            if (baseCurrency == null || targetCurrency == null) {
+                writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
+                return;
+            }
             ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            if (rate == null) {
+                writeError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange rate not found");
+                return;
+            }
             DTOExchangeRate dto = new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP));
 
             writeJson(response, HttpServletResponse.SC_OK, dto);
-        } catch (NullPointerException e) {
-            log.info("ExchangeRate servlet NullPointerException(doGET_1): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
+        
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
