@@ -28,7 +28,7 @@ public class ExchangeRateServlet extends BaseServlet {
             throws IOException {
         try {
             String pathInfo = request.getPathInfo();
-            if (pathInfo == null || pathInfo.length() < 7) {
+            if (pathInfo == null || pathInfo.length() != 7) {
                 log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
                 return;
