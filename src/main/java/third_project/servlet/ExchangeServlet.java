@@ -1,27 +1,16 @@
 package third_project.servlet;
 
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import third_project.DbConnection.CurrenciesDbConnector;
-import third_project.DbConnection.ExchangeRatesDbConnector;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.dto.DTOExchange;
-import third_project.dto.DTOExchangeRate;
-import third_project.DbConnection.CurrenciesDbConnector;
-import third_project.DbConnection.ExchangeRatesDbConnector;
-import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.logging.Logger;
 
 @WebServlet(name = "exchange", value = "/exchange")
 public class ExchangeServlet extends BaseServlet {
@@ -34,7 +23,7 @@ public class ExchangeServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
@@ -45,11 +34,13 @@ public class ExchangeServlet extends BaseServlet {
 
             if (currenciesDbConnector.findByCode(from) == null) {
                 log.warning("ExchangeServlet: base currency not found: from=" + from + " [File: ExchangeServlet.java]");
-                throw new IllegalArgumentException("base currency not found");
+                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "base currency not found");
+                return;
             }
             if (currenciesDbConnector.findByCode(to) == null) {
                 log.warning("ExchangeServlet: target currency not found: to=" + to + " [File: ExchangeServlet.java]");
-                throw new IllegalArgumentException("target currency not found");
+                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "target currency not found");
+                return;
             }
             ExchangeRate rate;
             DTOExchange result;
@@ -75,7 +66,9 @@ public class ExchangeServlet extends BaseServlet {
                 result = new DTOExchange(currenciesDbConnector.findByCode(from), currenciesDbConnector.findByCode(to), firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
 
             } else {
-                throw new Exception("Exchange servlet: no currency exchange rate");
+                //                throw new Exception("Exchange servlet: no currency exchange rate");
+                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "no currency exchange rate");
+                return;
             }
             writeJson(response, HttpServletResponse.SC_OK, result);
 

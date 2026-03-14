@@ -104,12 +104,14 @@ public class ExchangeRateServlet extends BaseServlet {
             if (existing == null) {
                 log.info("ExchangeRate servlet: exchange rate doesn't exist" + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange rate doesn't exist");
+                return;
             }
 
             ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate);
             if (updated == null) {
                 log.info("ExchangeRate servlet exchange rate wasn't updated!(doPATCH) " + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Exchange rate wasn't updated");
+                return;
             }
             log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
             DTOExchangeRate dto = new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP));
@@ -122,7 +124,6 @@ public class ExchangeRateServlet extends BaseServlet {
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-
         }
     }
 }

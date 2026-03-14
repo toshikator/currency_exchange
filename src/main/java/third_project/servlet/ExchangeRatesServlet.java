@@ -38,12 +38,14 @@ public class ExchangeRatesServlet extends BaseServlet {
             if (exchangeRates.isEmpty()) {
                 log.warning("ExchangeRatesServlet (doGet): empty dataset of DTOs: " + " [File: ExchangeRatesServlet.java]");
                 writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "empty dataset of DTOs");
+                return;
             }
             writeJson(response, HttpServletResponse.SC_OK, exchangeRates);
 
         } catch (Exception e) {
             log.warning("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "ExchangeRatesServlet General exception");
+
         }
     }
 
@@ -62,6 +64,7 @@ public class ExchangeRatesServlet extends BaseServlet {
                         baseCurrencyCode + ", " +
                         "target=" + targetCurrencyCode + ", rate=" + rateParam + " [File: ExchangeRatesServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "invalid parameters input");
+                return;
             }
 
             baseCurrencyCode = baseCurrencyCode.toUpperCase();
@@ -72,6 +75,7 @@ public class ExchangeRatesServlet extends BaseServlet {
                         + baseCurrencyCode + " [File: ExchangeRatesServlet.java]");
                 //                throw new IllegalStateException("baseCurrencyCode and targetCurrencyCode must be different");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "base currency and target currency should be different");
+                return;
             }
 
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
@@ -82,6 +86,7 @@ public class ExchangeRatesServlet extends BaseServlet {
                         + targetCurrencyCode + " [File: ExchangeRatesServlet.java]");
                 //                throw new IllegalArgumentException("invalid currency ");
                 writeError(response, HttpServletResponse.SC_NOT_FOUND, "invalid currency or currency doesn't presented");
+                return;
             }
 
             BigDecimal rate;
