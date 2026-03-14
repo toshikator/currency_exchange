@@ -50,15 +50,11 @@ public final class PatchBodyParser {
         try (BufferedReader reader = request.getReader();
              StringWriter writer = new StringWriter()) {
 
-            // Java 9+ method, работает и в 21
             reader.transferTo(writer);
             return writer.toString();
         }
     }
 
-    /**
-     * Parse application/x-www-form-urlencoded body manually.
-     */
     private static Map<String, List<String>> parseUrlEncoded(String form) {
         if (form == null || form.isEmpty()) {
             return Map.of();
@@ -82,9 +78,6 @@ public final class PatchBodyParser {
         return map;
     }
 
-    /**
-     * Parse JSON using Jackson.
-     */
     private static Map<String, Object> parseJson(String json) throws IOException {
         if (json == null || json.isBlank()) {
             return Map.of();
@@ -92,18 +85,14 @@ public final class PatchBodyParser {
         return MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
     }
 
-    /**
-     * Result wrapper object – record is fully supported in Java 21.
-     */
     public record ParsedBody(
             String raw,
-            Map<String, List<String>> form,   // For x-www-form-urlencoded
-            Map<String, Object> json          // For JSON
+            Map<String, List<String>> form,
+            Map<String, Object> json
     ) {
         public String getFirst(String key) {
             List<String> list = form.get(key);
             if (list == null || list.isEmpty()) return null;
-            // без List.getFirst() — чтобы не упираться в совсем свежие методы коллекций
             return list.get(0);
         }
 

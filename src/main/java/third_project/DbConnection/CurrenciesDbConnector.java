@@ -83,9 +83,7 @@ public class CurrenciesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            //            log.info("Exception in findByCode [File: CurrenciesDbConnector.java]");
             log.info("Exception in findByCode. Currency code = " + code + " [File: CurrenciesDbConnector.java] " + ex.getMessage());
-            //            log.info(ex + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }
@@ -104,8 +102,6 @@ public class CurrenciesDbConnector {
             }
         } catch (Exception ex) {
             log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
-            //            log.info("Currency id = " + id + " [File: CurrenciesDbConnector.java]");
-            //            log.info(ex + " [File: CurrenciesDbConnector.java]");
         }
         return null;
     }

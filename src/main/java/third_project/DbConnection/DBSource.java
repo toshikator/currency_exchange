@@ -11,14 +11,12 @@ public final class DBSource {
     private static final Logger log = Logger.getLogger("com.example");
     private static volatile DBSource INSTANCE;
 
-    // Database connectivity properties (copied from PropertiesReader at initialization)
     private final String address;
     private final String port;
     private final String databaseName;
     private final String username;
     private final String password;
 
-    // DB schema/table and columns configuration
     private final String currenciesTableName;
     private final int currenciesIdCol;
     private final int currenciesCodeCol;
@@ -31,11 +29,9 @@ public final class DBSource {
     private final int targetCurrencyIdCol;
     private final int rateCol;
 
-    // Resolved DataSource
     private final DataSource ds;
 
     private DBSource(PropertiesReader pr) {
-        // Copy all properties to immutable fields
         this.address = pr.getAddress();
         this.port = pr.getPort();
         this.databaseName = pr.getDatabaseName();
@@ -54,7 +50,6 @@ public final class DBSource {
         this.targetCurrencyIdCol = pr.getTargetCurrencyIdCol();
         this.rateCol = pr.getRateCol();
 
-        // Initialize the underlying pool and DataSource
         HikariPool.init(pr);
         this.ds = HikariPool.get();
     }

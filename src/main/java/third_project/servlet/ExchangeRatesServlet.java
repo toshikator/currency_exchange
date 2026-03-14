@@ -52,8 +52,6 @@ public class ExchangeRatesServlet extends BaseServlet {
 
         } catch (Exception e) {
             log.warning("ExchangeRatesServlet (doGet): servlet global error: " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.getWriter().println("servlet global error: " + e.getMessage());
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "servlet global error: " + e.getMessage());
         }
     }
@@ -61,13 +59,10 @@ public class ExchangeRatesServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        //        response.setContentType("application/json");
-        //        response.setCharacterEncoding("UTF-8");
         try {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             String rateParam = request.getParameter("rate");
-            //            log.info("ExchangeRatesServlet doPost parameters: " + Arrays.toString(new String[]{baseCurrencyCode, targetCurrencyCode, rateParam}));
 
             if (!Validation.isStringValid(baseCurrencyCode)
                     && !Validation.isStringValid(targetCurrencyCode)
@@ -104,7 +99,6 @@ public class ExchangeRatesServlet extends BaseServlet {
             ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
             if (existing != null) {
                 log.info("exchange rate already exists [File: ExchangeRatesServlet.java]");
-                //                response.setStatus(HttpServletResponse.SC_CONFLICT);
                 writeError(response, HttpServletResponse.SC_CONFLICT, "exchange rate already exists");
                 return;
             }
@@ -115,31 +109,18 @@ public class ExchangeRatesServlet extends BaseServlet {
             }
 
             DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency, targetCurrency, rate);
-
-            //            objectMapper.writeValue(response.getWriter(), dto);
-            //            response.setStatus(HttpServletResponse.SC_CREATED);
             writeJson(response, HttpServletResponse.SC_CREATED, dto);
         } catch (NumberFormatException nfe) {
-            //            log.info("rate must be a number [File: ExchangeRatesServlet.java]");
-            //            response.getWriter().println("rate must be a number" + nfe.getMessage());
-
             log.info("ExchangeRatesServlet NumberFormatException exception(doPOST): " + nfe.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, "rate must be a number");
         } catch (IllegalArgumentException e) {
-            //            response.getWriter().println("invalid currency" + e.getMessage());
             log.info("ExchangeRatesServlet IllegalArgumentException(invalid currency code) exception(doPOST): " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             writeError(response, HttpServletResponse.SC_NOT_FOUND, "invalid currency code");
         } catch (IllegalStateException e) {
             log.info("ExchangeRatesServlet IllegalStateException(invalid parameters) exception(doPOST): " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.getWriter().println("invalid parameters" + e.getMessage());
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, "invalid parameters");
         } catch (Exception e) {
             log.info("ExchangeRatesServlet General exception(doPOST): " + e.getMessage() + " [File: ExchangeRatesServlet.java]");
-            //            response.getWriter().println("error by exchange rate servlet" + e.getMessage());
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "ExchangeRatesServlet General exception(doPOST): " + e.getMessage());
         }
     }

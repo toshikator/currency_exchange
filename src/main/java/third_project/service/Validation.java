@@ -21,7 +21,6 @@ public final class Validation {
     }
 
     public static boolean isStringConvertableToBigDecimal(String str) {
-        //        log.info("string on validation" + " " + str);
         try {
             new BigDecimal(str);
             return true;
@@ -33,7 +32,6 @@ public final class Validation {
 
 
     public static boolean areThreeStringsValid(String name, String code, String sign) {
-        //        log.info("name= " + isStringValid(name) + " code= " + isStringValid(code) + " sign= " + isStringValid(sign) + " Validation File, Three Strings");
         return isStringValid(name) && isStringValid(code) && isStringValid(sign);
     }
 

@@ -93,7 +93,6 @@ public final class HikariPool {
                 }
             }
         }
-        // Do not log sensitive data like credentials.
         log.info("HikariPool is ready (DataSource initialized). [File: HikariPool.java]");
         return local.ds;
     }

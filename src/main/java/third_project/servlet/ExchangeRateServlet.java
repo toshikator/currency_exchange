@@ -126,31 +126,19 @@ public class ExchangeRateServlet extends BaseServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            //            log.info("ExchangeRate updated:" + updated + " [File: ExchangeRateServlet.java]");
             log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
             DTOExchangeRate dto = new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP));
-            //            response.getWriter().println(new ObjectMapper().writeValueAsString(dto));
-            //            response.setStatus(HttpServletResponse.SC_OK);
             writeJson(response, HttpServletResponse.SC_OK, dto);
 
         } catch (IllegalArgumentException e) {
-            //            log.info(e.getMessage() + " [File: ExchangeRateServlet.java]");
             log.info("ExchangeRate servlet IllegalArgumentException(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            //            response.getWriter().println(e.getMessage());
-            //            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (NullPointerException e) {
-            //            log.info(e.getMessage() + " [File: ExchangeRateServlet.java]");
             log.info("ExchangeRate servlet NullPointerException(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            //            response.getWriter().println(e.getMessage() + " Null pointer exception");
-            //            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             writeError(response, HttpServletResponse.SC_NOT_FOUND, "Null pointer exception");
 
         } catch (Exception e) {
-            //            log.info(e.getMessage() + " [File: ExchangeRateServlet.java]");
             log.info("ExchangeRate servlet unexpected Exception(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            //            response.getWriter().println(e.getMessage());
-            //            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             throw new ServletException("Error updating exchange rate", e);
         }
