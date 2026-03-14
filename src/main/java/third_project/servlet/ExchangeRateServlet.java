@@ -1,6 +1,5 @@
 package third_project.servlet;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,7 +53,7 @@ public class ExchangeRateServlet extends BaseServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
             //            log.info("pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
