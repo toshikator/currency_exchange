@@ -1,23 +1,17 @@
 package third_project.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.entities.Currency;
 import third_project.dto.DTOExchangeRate;
-import third_project.DbConnection.CurrenciesDbConnector;
-import third_project.DbConnection.ExchangeRatesDbConnector;
+import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @WebServlet(name = "exchangeRates", value = "/exchangeRates")
@@ -66,7 +60,7 @@ public class ExchangeRatesServlet extends BaseServlet {
 
             if (!Validation.isStringValid(baseCurrencyCode)
                     && !Validation.isStringValid(targetCurrencyCode)
-                    && !Validation.isStringConvertableToBigDecimal(rateParam)) {
+                    && !Validation.isStringConvertableToBigDecimalRate(rateParam)) {
                 log.warning("ExchangeRatesServlet: invalid parameters: base=" +
                         baseCurrencyCode + ", " +
                         "target=" + targetCurrencyCode + ", rate=" + rateParam + " [File: ExchangeRatesServlet.java]");

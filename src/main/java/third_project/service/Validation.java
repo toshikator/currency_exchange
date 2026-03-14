@@ -2,13 +2,11 @@ package third_project.service;
 
 
 import third_project.DbConnection.CurrenciesDbConnector;
-import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
 
 
 public final class Validation {
@@ -20,10 +18,11 @@ public final class Validation {
         return str != null && !str.isBlank() && str.matches(regex);
     }
 
-    public static boolean isStringConvertableToBigDecimal(String str) {
+    public static boolean isStringConvertableToBigDecimalRate(String str) {
+        if (!isStringValid(str)) return false;
         try {
             new BigDecimal(str);
-            return true;
+            return !isZeroOrNegative(new BigDecimal(str));
         } catch (NumberFormatException e) {
             log.warning("string on validation" + " " + str + " " + e.getMessage() + " [File: Validation.java]");
             return false;

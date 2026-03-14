@@ -1,28 +1,18 @@
 package third_project.servlet;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import third_project.dto.DTOExchangeRate;
-import third_project.DbConnection.CurrenciesDbConnector;
-import third_project.DbConnection.ExchangeRatesDbConnector;
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
 import third_project.service.PatchBodyParser;
 import third_project.service.Validation;
 
-
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 @WebServlet(name = "exchangeRate", value = "/exchangeRate/*")
@@ -36,7 +26,7 @@ public class ExchangeRateServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         try {
             String pathInfo = request.getPathInfo();
             if (pathInfo == null || pathInfo.length() < 7) {
@@ -47,11 +37,6 @@ public class ExchangeRateServlet extends BaseServlet {
             String path = pathInfo.substring(1);
             String baseCurrencyCode = path.substring(0, 3).toUpperCase();
             String targetCurrencyCode = path.substring(3, 6).toUpperCase();
-            if (baseCurrencyCode == null || targetCurrencyCode == null) {
-                log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
-                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
-                return;
-            }
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
             ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
@@ -64,7 +49,6 @@ public class ExchangeRateServlet extends BaseServlet {
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-            throw new ServletException("Error processing exchange rate request", e);
         }
     }
 
@@ -73,16 +57,17 @@ public class ExchangeRateServlet extends BaseServlet {
             throws ServletException, IOException {
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
-            log.info("pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
+            //            log.info("pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
 
             if (!Validation.isPatchRequestValid(pathInfo)) {
                 log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
-                throw new IllegalArgumentException("Invalid pathInfo");
+                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
+                return;
             }
 
             String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
             String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
-            log.info("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode + " [File: ExchangeRateServlet.java]");
+            //            log.info("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode + " [File: ExchangeRateServlet.java]");
 
             PatchBodyParser.ParsedBody parsedBody = PatchBodyParser.parse(request);
 
@@ -96,20 +81,20 @@ public class ExchangeRateServlet extends BaseServlet {
                     rateParam = String.valueOf(jsonRate);
                 }
             }
-            log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
-            if (!Validation.isStringValid(rateParam)) {
+            //            log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
+            if (!Validation.isStringConvertableToBigDecimalRate(rateParam)) {
                 log.warning("ExchangeRateServlet: Invalid rate parameter: " + rateParam + " [File: ExchangeRateServlet.java]");
-                throw new IllegalArgumentException("Invalid rate parameter");
+                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid rate parameter");
+                return;
             }
 
-            Validation.isStringConvertableToBigDecimal(rateParam);
             log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
             BigDecimal newRate = new BigDecimal(rateParam);
 
-            if (Validation.isZeroOrNegative(newRate)) {
-                log.warning("ExchangeRateServlet: Invalid rate value: " + newRate + " [File: ExchangeRateServlet.java]");
-                throw new IllegalArgumentException("Invalid rate value");
-            }
+            //            if (Validation.isZeroOrNegative(newRate)) {
+            //                log.warning("ExchangeRateServlet: Invalid rate value: " + newRate + " [File: ExchangeRateServlet.java]");
+            //                throw new IllegalArgumentException("Invalid rate value");
+            //            }
 
             int baseCurrencyId = 0;
             int targetCurrencyId = 0;
@@ -118,13 +103,14 @@ public class ExchangeRateServlet extends BaseServlet {
 
             ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
             if (existing == null) {
-                throw new NullPointerException("Exchange rate not found");
+                log.info("ExchangeRate servlet: exchange rate doesn't exist" + " [File: ExchangeRateServlet.java]");
+                writeError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange rate doesn't exist");
             }
 
             ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate);
             if (updated == null) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+                log.info("ExchangeRate servlet exchange rate wasn't updated!(doPATCH) " + " [File: ExchangeRateServlet.java]");
+                writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Exchange rate wasn't updated");
             }
             log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
             DTOExchangeRate dto = new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP));
@@ -133,14 +119,11 @@ public class ExchangeRateServlet extends BaseServlet {
         } catch (IllegalArgumentException e) {
             log.info("ExchangeRate servlet IllegalArgumentException(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        } catch (NullPointerException e) {
-            log.info("ExchangeRate servlet NullPointerException(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
-            writeError(response, HttpServletResponse.SC_NOT_FOUND, "Null pointer exception");
 
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doPATCH): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-            throw new ServletException("Error updating exchange rate", e);
+
         }
     }
 }
