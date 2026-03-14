@@ -59,7 +59,7 @@ public class ExchangeRatesServlet extends BaseServlet {
 
             if (!Validation.isStringValid(baseCurrencyCode)
                     || !Validation.isStringValid(targetCurrencyCode)
-                    || !Validation.isStringConvertableToBigDecimalRate(rateParam)) {
+                    || !Validation.isStringConvertableToBigDecimalRate(rateParam) || baseCurrencyCode.equals(targetCurrencyCode)) {
                 log.warning("ExchangeRatesServlet: invalid parameters: base=" +
                         baseCurrencyCode + ", " +
                         "target=" + targetCurrencyCode + ", rate=" + rateParam + " [File: ExchangeRatesServlet.java]");
