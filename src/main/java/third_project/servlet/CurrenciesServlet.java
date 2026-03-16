@@ -20,7 +20,7 @@ public class CurrenciesServlet extends BaseServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
- 
+
         try {
             String name = request.getParameter("name");
             String code = request.getParameter("code");
@@ -36,7 +36,7 @@ public class CurrenciesServlet extends BaseServlet {
                 writeError(response, HttpServletResponse.SC_CONFLICT, "Currency with such code already exists");
                 return;
             }
-            Currency currency = currenciesDbConnector.insert(code, name, sign);
+            Currency currency = currenciesDbConnector.insert(code, name, sign).orElseThrow(() -> new IllegalStateException("Currency wasn't inserted"));
 
             writeJson(response, HttpServletResponse.SC_CREATED, currency);
 

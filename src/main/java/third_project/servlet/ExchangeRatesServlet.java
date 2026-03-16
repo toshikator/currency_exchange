@@ -82,8 +82,8 @@ public class ExchangeRatesServlet extends BaseServlet {
                 return;
             }
 
-            Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode);
-            Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode);
+            Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode).orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found"));
+            Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode).orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found"));
 
             if (!Validation.isCurrencyValid(baseCurrency) || !Validation.isCurrencyValid(targetCurrency)) {
                 log.warning("ExchangeRatesServlet: invalid currency code(s): base=" + baseCurrencyCode + ", target="

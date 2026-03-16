@@ -4,10 +4,7 @@ package third_project.DbConnection;
 import third_project.entities.Currency;
 import third_project.service.PropertiesReader;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -26,7 +23,7 @@ public class CurrenciesDbConnector {
 
     }
 
-    public Currency insert(String code, String name, String sign) {
+    public Optional<Currency> insert(String code, String name, String sign) {
         String sql = "INSERT INTO " + pr.getCurrenciesTableName() + " (CODE, SIGN, FULL_NAME) VALUES (?, ?, ?)";
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -37,10 +34,10 @@ public class CurrenciesDbConnector {
 
 
             return findByCode(code);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             log.warning("insert exception: " + ex + "File: CurrenciesDbConnector.java");
         }
-        return null;
+        return Optional.empty();
     }
 
     public int update(Currency currency) {
@@ -73,7 +70,7 @@ public class CurrenciesDbConnector {
         return 0;
     }
 
-    public Currency findByCode(String code) {
+    public Optional<Currency> findByCode(String code) throws SQLException {
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE CODE = ?")) {
             ps.setString(1, code.toUpperCase());
@@ -82,13 +79,12 @@ public class CurrenciesDbConnector {
                     int id = rs.getInt(pr.getCurrenciesIdCol());
                     String fullName = rs.getString(pr.getCurrenciesFullNameCol());
                     String sign = rs.getString(pr.getCurrenciesSignCol());
-                    return new Currency(id, code.toUpperCase(), fullName, sign);
+                    return Optional.ofNullable(new Currency(id, code.toUpperCase(), fullName, sign));
                 }
             }
-        } catch (Exception ex) {
-            log.info("Exception in findByCode. Currency code = " + code + " [File: CurrenciesDbConnector.java] " + ex.getMessage());
+
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<Currency> findById(int id) {

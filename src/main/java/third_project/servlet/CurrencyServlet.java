@@ -20,7 +20,7 @@ public class CurrencyServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
- 
+
         try {
             String pathInfo = request.getPathInfo();
             if (!Validation.isStringValid(pathInfo)) {
@@ -30,7 +30,8 @@ public class CurrencyServlet extends BaseServlet {
             }
             Currency currency;
 
-            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1), currenciesDbConnector) ? currenciesDbConnector.findByCode(pathInfo.substring(1)) : null;
+            currency = Validation.isCurrencyExist(request.getPathInfo().substring(1), currenciesDbConnector)
+                    ? currenciesDbConnector.findByCode(pathInfo.substring(1)).orElseThrow(() -> new IllegalStateException("Somehow currency wasn't found")) : null;
             if (currency == null) {
                 log.warning("CurrencyServlet: Currency not found for pathInfo=" + pathInfo + " [File: CurrencyServlet.java]");
                 writeError(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found");
