@@ -4,11 +4,14 @@ package third_project.DbConnection;
 import third_project.entities.Currency;
 import third_project.service.PropertiesReader;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.logging.Level;
+import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 
 public class CurrenciesDbConnector {
@@ -88,7 +91,7 @@ public class CurrenciesDbConnector {
         return null;
     }
 
-    public Currency findById(int id) {
+    public Optional<Currency> findById(int id) {
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?")) {
             ps.setInt(1, id);
@@ -97,13 +100,13 @@ public class CurrenciesDbConnector {
                     String code = rs.getString(pr.getCurrenciesCodeCol());
                     String fullName = rs.getString(pr.getCurrenciesFullNameCol());
                     String sign = rs.getString(pr.getCurrenciesSignCol());
-                    return new Currency(id, code, fullName, sign);
+                    return Optional.ofNullable(new Currency(id, code, fullName, sign));
                 }
             }
         } catch (Exception ex) {
             log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
         }
-        return null;
+        return Optional.empty();
     }
 
     public ArrayList<Currency> getAllCurrencies() {

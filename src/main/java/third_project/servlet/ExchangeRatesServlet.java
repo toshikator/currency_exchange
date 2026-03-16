@@ -30,8 +30,12 @@ public class ExchangeRatesServlet extends BaseServlet {
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
-                result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId()));
-                result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId()));
+
+                result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId())
+                        .orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")));
+                result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId())
+                        .orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")));
+
                 result.setRate(exchangeRate.getRate().setScale(2, RoundingMode.HALF_UP));
                 return result;
             }).collect(Collectors.toList());

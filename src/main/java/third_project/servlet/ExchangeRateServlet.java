@@ -50,7 +50,7 @@ public class ExchangeRateServlet extends BaseServlet {
             DTOExchangeRate dto = new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP));
 
             writeJson(response, HttpServletResponse.SC_OK, dto);
-        
+
         } catch (Exception e) {
             log.info("ExchangeRate servlet unexpected Exception(doGET_2): " + e.getMessage() + " [File: ExchangeRateServlet.java]");
             writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -119,8 +119,11 @@ public class ExchangeRateServlet extends BaseServlet {
                 writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Exchange rate wasn't updated");
                 return;
             }
-            log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
-            DTOExchangeRate dto = new DTOExchangeRate(updated.getId(), currenciesDbConnector.findById(baseCurrencyId), currenciesDbConnector.findById(targetCurrencyId), updated.getRate().setScale(2, RoundingMode.HALF_UP));
+            //                        log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
+            DTOExchangeRate dto = new DTOExchangeRate(updated.getId()
+                    , currenciesDbConnector.findById(baseCurrencyId).orElseThrow(() -> new Exception("Somehow base currency wasn't found"))
+                    , currenciesDbConnector.findById(targetCurrencyId).orElseThrow(() -> new Exception("Somehow target currency wasn't found"))
+                    , updated.getRate().setScale(2, RoundingMode.HALF_UP));
             writeJson(response, HttpServletResponse.SC_OK, dto);
 
         } catch (IllegalArgumentException e) {

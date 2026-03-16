@@ -6,11 +6,14 @@ import third_project.entities.ExchangeRate;
 import third_project.service.PropertiesReader;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 
 public class ExchangeRatesDbConnector {
@@ -96,12 +99,12 @@ public class ExchangeRatesDbConnector {
                 }
             }
         } catch (Exception ex) {
-            log.info(String.valueOf(ex) + " [File: ExchangeRatesDbConnector.java]");
+            log.info(ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return exchangeRates;
     }
 
-    public ExchangeRate insert(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+    public ExchangeRate insert(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) throws SQLException {
         Currency baseCurrency = null;
         Currency targetCurrency = null;
         try {
@@ -117,7 +120,7 @@ public class ExchangeRatesDbConnector {
         return exchangeRate;
     }
 
-    public ExchangeRate insert(int baseCurrencyCode, int targetCurrencyCode, BigDecimal rate) {
+    public ExchangeRate insert(int baseCurrencyCode, int targetCurrencyCode, BigDecimal rate) throws SQLException {
         ExchangeRate exchangeRate = null;
 
         try (Connection conn = DBSource.get().getConnection()) {
@@ -128,10 +131,12 @@ public class ExchangeRatesDbConnector {
                 ps.setBigDecimal(3, rate);
                 ps.executeUpdate();
             }
+            Currency baseCurrency = currenciesDbConnector.findById(baseCurrencyCode)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid or missed baseCurrency code provided"));
+            Currency targetCurrency = currenciesDbConnector.findById(targetCurrencyCode)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid or missed targetCurrency code provided"));
 
-            exchangeRate = this.findRate(currenciesDbConnector.findById(baseCurrencyCode).getId(), currenciesDbConnector.findById(targetCurrencyCode).getId());
-        } catch (Exception e) {
-            log.info("insert exception: " + e + " [File: ExchangeRatesDbConnector.java]");
+            exchangeRate = this.findRate(baseCurrency.getId(), targetCurrency.getId());
         }
         return exchangeRate;
     }
