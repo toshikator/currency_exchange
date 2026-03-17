@@ -31,7 +31,7 @@ public class CurrenciesServlet extends BaseServlet {
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
                 return;
             }
-            if (currenciesDbConnector.findByCode(code) != null) {
+            if (currenciesDbConnector.findByCode(code).isPresent()) {
                 log.warning("currency with such code already exists [File: CurrenciesServlet.java]");
                 writeError(response, HttpServletResponse.SC_CONFLICT, "Currency with such code already exists");
                 return;

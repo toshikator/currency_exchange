@@ -65,7 +65,7 @@ public final class Validation {
 
     public static boolean isCurrencyValid(Currency currency) {
 
-        return currency != null && currency.getId() > 0 && currency.getCode() != null && currency.getFullName() != null && currency.getSign() != null;
+        return currency != null && currency.getId() > 0 && currency.getCode() != null && currency.getName() != null && currency.getSign() != null;
     }
 
     public static boolean isCurrencyExist(String currencyCode, CurrenciesDbConnector currenciesDbConnector) throws SQLException {

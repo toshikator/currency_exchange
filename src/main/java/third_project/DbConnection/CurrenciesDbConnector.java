@@ -46,7 +46,7 @@ public class CurrenciesDbConnector {
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
                 preparedStatement.setString(1, currency.getCode().toUpperCase());
                 preparedStatement.setString(2, currency.getSign());
-                preparedStatement.setString(3, currency.getFullName());
+                preparedStatement.setString(3, currency.getName());
                 preparedStatement.setInt(4, currency.getId());
                 return preparedStatement.executeUpdate();
             }
