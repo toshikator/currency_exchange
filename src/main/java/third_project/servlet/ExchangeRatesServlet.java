@@ -28,7 +28,7 @@ public class ExchangeRatesServlet extends BaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
-            List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().parallelStream().map((exchangeRate) -> {
+            List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().stream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
 
