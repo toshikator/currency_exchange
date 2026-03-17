@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import third_project.dto.DTOExchange;
 import third_project.entities.Currency;
 import third_project.entities.ExchangeRate;
-import third_project.service.Validation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -49,41 +48,39 @@ public class ExchangeServlet extends BaseServlet {
             Currency baseCurrency = currenciesDbConnector.findByCode(from).orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found"));
             Currency targetCurrency = currenciesDbConnector.findByCode(to).orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found"));
 
-
-
-            if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(baseCurrency.getId(),
-                    targetCurrency.getId()))) {
-                rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
-                BigDecimal convertedAmount = amount.multiply(rate.getRate());
-                convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
-                result = new DTOExchange(baseCurrency, targetCurrency,
-                        rate.getRate(), amount, convertedAmount);
-            } else if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(targetCurrency.getId(), baseCurrency.getId()))) {
-                rate = exchangeRatesDbConnector.findRate(targetCurrency.getId(), baseCurrency.getId());
-                BigDecimal convertedAmount = amount.multiply(new BigDecimal(1).divide(rate.getRate(), 6, RoundingMode.HALF_UP));
-                convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
-                result = new DTOExchange(baseCurrency, targetCurrency, rate.getRate(), amount, convertedAmount);
-            } else if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(baseCurrency.getId()
-                    , currenciesDbConnector.findByCode("USD").orElseThrow(() -> new IllegalStateException("Somehow there isn't currency for USD")).getId())) &&
-                    (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(currenciesDbConnector.findByCode("USD")
-                                    .orElseThrow(() -> new IllegalStateException("Somehow there isn't currency for USD")).getId()
-                            , targetCurrency.getId())))) {
-                Currency usdCurrency = currenciesDbConnector.findByCode("USD").orElseThrow(() -> new IllegalStateException("Somehow there isn't currency for USD"));
-                ExchangeRate firstRate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), usdCurrency.getId());
-                ExchangeRate secondRate = exchangeRatesDbConnector.findRate(usdCurrency.getId(), targetCurrency.getId());
-                BigDecimal convertedAmount = amount.multiply(firstRate.getRate()).divide(secondRate.getRate(), 6, RoundingMode.HALF_UP);
-                convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
-                result = new DTOExchange(baseCurrency, targetCurrency, firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
-
-            } else {
-                writeError(response, HttpServletResponse.SC_BAD_REQUEST, "no currency exchange rate");
+            ExchangeRate directRate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId()).orElse(null);
+            if (directRate != null) {
+                rate = directRate;
+                result = new DTOExchange(baseCurrency, targetCurrency, rate.getRate(), amount, amount.multiply(rate.getRate()));
+                writeJson(response, HttpServletResponse.SC_OK, result);
                 return;
             }
+
+            ExchangeRate inverseRate = exchangeRatesDbConnector.findRate(targetCurrency.getId(), baseCurrency.getId()).orElse(null);
+            if (inverseRate != null) {
+                rate = inverseRate;
+                result = new DTOExchange(baseCurrency, targetCurrency, rate.getRate(), amount, amount.divide(rate.getRate(), 6, RoundingMode.HALF_UP));
+                writeJson(response, HttpServletResponse.SC_OK, result);
+                return;
+            }
+
+            Currency usdCurrency = currenciesDbConnector.findByCode("USD").orElseThrow(() -> new IllegalStateException("Somehow there isn't currency for USD"));
+            ExchangeRate baseToUSD = exchangeRatesDbConnector.findRate(baseCurrency.getId(), usdCurrency.getId())
+                    .orElseThrow(() -> new IllegalStateException("Somehow base currency to USD exchange rate wasn't found"));
+            ExchangeRate USDtoTarget = exchangeRatesDbConnector.findRate(usdCurrency.getId(), targetCurrency.getId())
+                    .orElseThrow(() -> new IllegalStateException("Somehow USD to target currency exchange rate wasn't found"));
+
+            BigDecimal convertedAmount = amount.multiply(baseToUSD.getRate()).divide(USDtoTarget.getRate(), 6, RoundingMode.HALF_UP)
+                    .setScale(2, RoundingMode.HALF_UP);
+            result = new DTOExchange(baseCurrency, targetCurrency, baseToUSD.getRate().multiply(USDtoTarget.getRate()), amount, convertedAmount);
             writeJson(response, HttpServletResponse.SC_OK, result);
 
+        } catch (IllegalStateException ise) {
+            log.info("ExchangeServlet Exception(doGET) :" + ise.getMessage() + " [File: ExchangeServlet.java]");
+            writeError(response, HttpServletResponse.SC_BAD_REQUEST, ise.getMessage());
         } catch (Exception e) {
             log.info("ExchangeServlet Exception(doGET) :" + e.getMessage() + " [File: ExchangeServlet.java]");
-            writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Currency not found or exchange rate not found or shit happened");
+            writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Currency not found or exchange rate not found or shit happened" + e.getMessage());
         }
 
 

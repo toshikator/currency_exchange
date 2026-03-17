@@ -94,14 +94,15 @@ public class ExchangeRatesServlet extends BaseServlet {
             BigDecimal rate;
             rate = new BigDecimal(rateParam);
 
-            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
+            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId()).orElse(null);
             if (existing != null) {
                 log.info("exchange rate already exists [File: ExchangeRatesServlet.java]");
                 writeError(response, HttpServletResponse.SC_CONFLICT, "exchange rate already exists");
                 return;
             }
 
-            ExchangeRate created = exchangeRatesDbConnector.insert(baseCurrencyCode, targetCurrencyCode, rate);
+            ExchangeRate created = exchangeRatesDbConnector.insert(baseCurrencyCode, targetCurrencyCode, rate)
+                    .orElseThrow(() -> new IllegalStateException("Exchange rate wasn't created"));
             DTOExchangeRate dto = new DTOExchangeRate(created.getId(), baseCurrency, targetCurrency, rate);
             writeJson(response, HttpServletResponse.SC_CREATED, dto);
 

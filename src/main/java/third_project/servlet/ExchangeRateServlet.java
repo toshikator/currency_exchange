@@ -39,11 +39,8 @@ public class ExchangeRateServlet extends BaseServlet {
             Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode).orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found"));
             Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode).orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found"));
 
-            ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
-            if (rate == null) {
-                writeError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange rate not found");
-                return;
-            }
+            ExchangeRate rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId()).orElseThrow(() -> new IllegalStateException("Somehow exchange rate wasn't found"));
+
             DTOExchangeRate dto = new DTOExchangeRate(rate.getId(), baseCurrency, targetCurrency, rate.getRate().setScale(2, RoundingMode.HALF_UP));
 
             writeJson(response, HttpServletResponse.SC_OK, dto);
@@ -89,7 +86,8 @@ public class ExchangeRateServlet extends BaseServlet {
                 return;
             }
 
-            log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
+
+            assert rateParam != null;
             BigDecimal newRate = new BigDecimal(rateParam);
 
 
@@ -98,19 +96,9 @@ public class ExchangeRateServlet extends BaseServlet {
             int targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode)
                     .orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")).getId();
 
-            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId);
-            if (existing == null) {
-                log.info("ExchangeRate servlet: exchange rate doesn't exist" + " [File: ExchangeRateServlet.java]");
-                writeError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange rate doesn't exist");
-                return;
-            }
+            ExchangeRate existing = exchangeRatesDbConnector.findRate(baseCurrencyId, targetCurrencyId).orElseThrow(() -> new IllegalStateException("Somehow exchange rate wasn't found"));
 
-            ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate);
-            if (updated == null) {
-                log.info("ExchangeRate servlet exchange rate wasn't updated!(doPATCH) " + " [File: ExchangeRateServlet.java]");
-                writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Exchange rate wasn't updated");
-                return;
-            }
+            ExchangeRate updated = exchangeRatesDbConnector.update(baseCurrencyId, targetCurrencyId, newRate).orElseThrow(() -> new IllegalStateException("Exchange rate wasn't updated"));
             DTOExchangeRate dto = new DTOExchangeRate(updated.getId()
                     , currenciesDbConnector.findById(baseCurrencyId).orElseThrow(() -> new Exception("Somehow base currency wasn't found"))
                     , currenciesDbConnector.findById(targetCurrencyId).orElseThrow(() -> new Exception("Somehow target currency wasn't found"))
