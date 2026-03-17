@@ -50,8 +50,6 @@ public class CurrenciesDbConnector {
                 preparedStatement.setInt(4, currency.getId());
                 return preparedStatement.executeUpdate();
             }
-            //        } catch (Exception ex) {
-            //            log.warning("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
         }
     }
 
@@ -98,8 +96,6 @@ public class CurrenciesDbConnector {
                     return Optional.ofNullable(new Currency(id, code, fullName, sign));
                 }
             }
-            //        } catch (Exception ex) {
-            //            log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
         }
         return Optional.empty();
     }
@@ -118,8 +114,6 @@ public class CurrenciesDbConnector {
                 Currency currency = new Currency(id, code, fullName, sign);
                 currencies.add(currency);
             }
-            //        } catch (Exception ex) {
-            //            log.info("Exception in getAllCurrencies" + ex + " [File: CurrenciesDbConnector.java]");
         }
         return currencies;
     }

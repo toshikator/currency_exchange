@@ -45,12 +45,8 @@ public class ExchangeRatesDbConnector {
                         BigDecimal rate = rs.getBigDecimal(pr.getRateCol());
                         return Optional.ofNullable(new ExchangeRate(id, baseCurrencyId, targetCurrencyId, rate));
                     }
-                    //                } catch (SQLException e) {
-                    //                    log.info("selectRate SQLException: " + e + " [File: ExchangeRatesDbConnector.java]");
                 }
             }
-            //        } catch (Exception ex) {
-            //            log.info("selectRate exception: " + ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return Optional.empty();
     }
@@ -70,9 +66,6 @@ public class ExchangeRatesDbConnector {
 
             }
             return findRate(baseCurrencyId, targetCurrencyId);
-            //        } catch (Exception e) {
-            //            log.info("update exception: " + e + " [File: ExchangeRatesDbConnector.java]");
-            //            return Optional.empty();
         }
     }
 
@@ -95,8 +88,6 @@ public class ExchangeRatesDbConnector {
 
                 }
             }
-            //        } catch (Exception ex) {
-            //            log.info(ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return exchangeRates;
     }
