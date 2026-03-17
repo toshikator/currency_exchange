@@ -30,7 +30,7 @@ public class ExchangeRatesDbConnector {
     }
 
 
-    public Optional<ExchangeRate> findRate(int baseCurrencyId, int targetCurrencyId) {
+    public Optional<ExchangeRate> findRate(int baseCurrencyId, int targetCurrencyId) throws SQLException {
         if (baseCurrencyId == 0 || targetCurrencyId == 0 || baseCurrencyId == targetCurrencyId) return Optional.empty();
 
         try (Connection conn = DBSource.get().getConnection()) {
@@ -45,17 +45,17 @@ public class ExchangeRatesDbConnector {
                         BigDecimal rate = rs.getBigDecimal(pr.getRateCol());
                         return Optional.ofNullable(new ExchangeRate(id, baseCurrencyId, targetCurrencyId, rate));
                     }
-                } catch (SQLException e) {
-                    log.info("selectRate SQLException: " + e + " [File: ExchangeRatesDbConnector.java]");
+                    //                } catch (SQLException e) {
+                    //                    log.info("selectRate SQLException: " + e + " [File: ExchangeRatesDbConnector.java]");
                 }
             }
-        } catch (Exception ex) {
-            log.info("selectRate exception: " + ex + " [File: ExchangeRatesDbConnector.java]");
+            //        } catch (Exception ex) {
+            //            log.info("selectRate exception: " + ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return Optional.empty();
     }
 
-    public Optional<ExchangeRate> update(int baseCurrencyId, int targetCurrencyId, BigDecimal newRate) {
+    public Optional<ExchangeRate> update(int baseCurrencyId, int targetCurrencyId, BigDecimal newRate) throws SQLException {
 
         try (Connection conn = DBSource.get().getConnection()) {
             String sql = "UPDATE " + pr.getExchangeRatesTableName() + " SET RATE = ? WHERE BASECURRENCYID = ? AND TARGETCURRENCYID = ?";
@@ -70,13 +70,13 @@ public class ExchangeRatesDbConnector {
 
             }
             return findRate(baseCurrencyId, targetCurrencyId);
-        } catch (Exception e) {
-            log.info("update exception: " + e + " [File: ExchangeRatesDbConnector.java]");
-            return Optional.empty();
+            //        } catch (Exception e) {
+            //            log.info("update exception: " + e + " [File: ExchangeRatesDbConnector.java]");
+            //            return Optional.empty();
         }
     }
 
-    public List<ExchangeRate> selectAll() {
+    public List<ExchangeRate> selectAll() throws SQLException {
 
         ArrayList<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
 
@@ -95,8 +95,8 @@ public class ExchangeRatesDbConnector {
 
                 }
             }
-        } catch (Exception ex) {
-            log.info(ex + " [File: ExchangeRatesDbConnector.java]");
+            //        } catch (Exception ex) {
+            //            log.info(ex + " [File: ExchangeRatesDbConnector.java]");
         }
         return exchangeRates;
     }

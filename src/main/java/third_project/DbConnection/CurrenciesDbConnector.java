@@ -40,7 +40,7 @@ public class CurrenciesDbConnector {
         return Optional.empty();
     }
 
-    public int update(Currency currency) {
+    public int update(Currency currency) throws SQLException {
         try (Connection conn = DBSource.get().getConnection()) {
             String sql = "UPDATE " + pr.getCurrenciesTableName() + " SET CODE = ?, SIGN = ?, FULL_NAME = ? WHERE id = ?";
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -50,10 +50,9 @@ public class CurrenciesDbConnector {
                 preparedStatement.setInt(4, currency.getId());
                 return preparedStatement.executeUpdate();
             }
-        } catch (Exception ex) {
-            log.warning("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
+            //        } catch (Exception ex) {
+            //            log.warning("update exception: " + ex + " [File: CurrenciesDbConnector.java]");
         }
-        return 0;
     }
 
     public int deleteById(int id) {
@@ -87,7 +86,7 @@ public class CurrenciesDbConnector {
         return Optional.empty();
     }
 
-    public Optional<Currency> findById(int id) {
+    public Optional<Currency> findById(int id) throws SQLException {
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName() + " WHERE id = ?")) {
             ps.setInt(1, id);
@@ -99,13 +98,13 @@ public class CurrenciesDbConnector {
                     return Optional.ofNullable(new Currency(id, code, fullName, sign));
                 }
             }
-        } catch (Exception ex) {
-            log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
+            //        } catch (Exception ex) {
+            //            log.info("Exception in findById [File: CurrenciesDbConnector.java]" + " Currency id = " + id);
         }
         return Optional.empty();
     }
 
-    public ArrayList<Currency> getAllCurrencies() {
+    public ArrayList<Currency> getAllCurrencies() throws SQLException {
         ArrayList<Currency> currencies = new ArrayList<Currency>();
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName());
@@ -119,8 +118,8 @@ public class CurrenciesDbConnector {
                 Currency currency = new Currency(id, code, fullName, sign);
                 currencies.add(currency);
             }
-        } catch (Exception ex) {
-            log.info("Exception in getAllCurrencies" + ex + " [File: CurrenciesDbConnector.java]");
+            //        } catch (Exception ex) {
+            //            log.info("Exception in getAllCurrencies" + ex + " [File: CurrenciesDbConnector.java]");
         }
         return currencies;
     }
