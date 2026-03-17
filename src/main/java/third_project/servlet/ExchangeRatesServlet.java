@@ -11,6 +11,7 @@ import third_project.service.Validation;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,11 +32,15 @@ public class ExchangeRatesServlet extends BaseServlet {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
 
-                result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId())
-                        .orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")));
-                result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId())
-                        .orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")));
+                try {
+                    result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId())
+                            .orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")));
 
+                    result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId())
+                            .orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 result.setRate(exchangeRate.getRate().setScale(2, RoundingMode.HALF_UP));
                 return result;
             }).collect(Collectors.toList());
