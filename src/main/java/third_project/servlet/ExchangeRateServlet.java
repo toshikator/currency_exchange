@@ -61,7 +61,6 @@ public class ExchangeRateServlet extends BaseServlet {
             throws IOException {
         try {
             String pathInfo = request.getPathInfo().toUpperCase();
-            //            log.info("pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
 
             if (!Validation.isPatchRequestValid(pathInfo)) {
                 log.warning("ExchangeRateServlet: Invalid pathInfo: " + pathInfo + " [File: ExchangeRateServlet.java]");
@@ -71,7 +70,6 @@ public class ExchangeRateServlet extends BaseServlet {
 
             String baseCurrencyCode = pathInfo.substring(1, 4).toUpperCase();
             String targetCurrencyCode = pathInfo.substring(4).toUpperCase();
-            //            log.info("baseCurrencyCode: " + baseCurrencyCode + " targetCurrencyCode: " + targetCurrencyCode + " [File: ExchangeRateServlet.java]");
 
             PatchBodyParser.ParsedBody parsedBody = PatchBodyParser.parse(request);
 
@@ -85,7 +83,6 @@ public class ExchangeRateServlet extends BaseServlet {
                     rateParam = String.valueOf(jsonRate);
                 }
             }
-            //            log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
             if (!Validation.isStringConvertableToBigDecimalRate(rateParam)) {
                 log.warning("ExchangeRateServlet: Invalid rate parameter: " + rateParam + " [File: ExchangeRateServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid rate parameter");
@@ -95,13 +92,7 @@ public class ExchangeRateServlet extends BaseServlet {
             log.info("rateParam: " + rateParam + " [File: ExchangeRateServlet.java]");
             BigDecimal newRate = new BigDecimal(rateParam);
 
-            //            if (Validation.isZeroOrNegative(newRate)) {
-            //                log.warning("ExchangeRateServlet: Invalid rate value: " + newRate + " [File: ExchangeRateServlet.java]");
-            //                throw new IllegalArgumentException("Invalid rate value");
-            //            }
 
-            //            int baseCurrencyId = 0;
-            //            int targetCurrencyId = 0;
             int baseCurrencyId = currenciesDbConnector.findByCode(baseCurrencyCode)
                     .orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")).getId();
             int targetCurrencyId = currenciesDbConnector.findByCode(targetCurrencyCode)
@@ -120,7 +111,6 @@ public class ExchangeRateServlet extends BaseServlet {
                 writeError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Exchange rate wasn't updated");
                 return;
             }
-            //                        log.info("CurrencyExchange rate updated:" + updated + " [File: ExchangeRateServlet.java]");
             DTOExchangeRate dto = new DTOExchangeRate(updated.getId()
                     , currenciesDbConnector.findById(baseCurrencyId).orElseThrow(() -> new Exception("Somehow base currency wasn't found"))
                     , currenciesDbConnector.findById(targetCurrencyId).orElseThrow(() -> new Exception("Somehow target currency wasn't found"))

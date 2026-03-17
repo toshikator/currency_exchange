@@ -49,13 +49,11 @@ public class ExchangeServlet extends BaseServlet {
             Currency baseCurrency = currenciesDbConnector.findByCode(from).orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found"));
             Currency targetCurrency = currenciesDbConnector.findByCode(to).orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found"));
 
-            //            rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
 
 
             if (Validation.isExchangeRateExist(exchangeRatesDbConnector.findRate(baseCurrency.getId(),
                     targetCurrency.getId()))) {
                 rate = exchangeRatesDbConnector.findRate(baseCurrency.getId(), targetCurrency.getId());
-                //                        currenciesDbConnector.findByCode(to).getId());
                 BigDecimal convertedAmount = amount.multiply(rate.getRate());
                 convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
                 result = new DTOExchange(baseCurrency, targetCurrency,
@@ -78,7 +76,6 @@ public class ExchangeServlet extends BaseServlet {
                 result = new DTOExchange(baseCurrency, targetCurrency, firstRate.getRate().multiply(secondRate.getRate()), amount, convertedAmount);
 
             } else {
-                //                throw new Exception("Exchange servlet: no currency exchange rate");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "no currency exchange rate");
                 return;
             }

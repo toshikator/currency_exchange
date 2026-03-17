@@ -77,7 +77,6 @@ public class ExchangeRatesServlet extends BaseServlet {
             if (baseCurrencyCode.equals(targetCurrencyCode)) {
                 log.warning("ExchangeRatesServlet: baseCurrencyCode and targetCurrencyCode must be different: "
                         + baseCurrencyCode + " [File: ExchangeRatesServlet.java]");
-                //                throw new IllegalStateException("baseCurrencyCode and targetCurrencyCode must be different");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "base currency and target currency should be different");
                 return;
             }
@@ -88,7 +87,6 @@ public class ExchangeRatesServlet extends BaseServlet {
             if (!Validation.isCurrencyValid(baseCurrency) || !Validation.isCurrencyValid(targetCurrency)) {
                 log.warning("ExchangeRatesServlet: invalid currency code(s): base=" + baseCurrencyCode + ", target="
                         + targetCurrencyCode + " [File: ExchangeRatesServlet.java]");
-                //                throw new IllegalArgumentException("invalid currency ");
                 writeError(response, HttpServletResponse.SC_NOT_FOUND, "invalid currency or currency doesn't presented");
                 return;
             }

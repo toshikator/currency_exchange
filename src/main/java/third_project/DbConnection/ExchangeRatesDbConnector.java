@@ -105,16 +105,9 @@ public class ExchangeRatesDbConnector {
     }
 
     public ExchangeRate insert(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) throws SQLException {
-        //        Currency baseCurrency = null;
-        //        Currency targetCurrency = null;
 
         Currency baseCurrency = currenciesDbConnector.findByCode(baseCurrencyCode).orElseThrow(() -> new IllegalArgumentException("Invalid baseCurrency code provided"));
-        //            if (baseCurrency == null) throw new IllegalArgumentException("Invalid baseCurrency code provided");
         Currency targetCurrency = currenciesDbConnector.findByCode(targetCurrencyCode).orElseThrow(() -> new IllegalArgumentException("Invalid targetCurrency code provided"));
-        //            if (targetCurrency == null) throw new IllegalArgumentException("Invalid targetCurrency code provided");
-
-        //        } catch (Exception e) {
-        //            log.info("Currency seeking exception on insert: " + e + " [File: ExchangeRatesDbConnector.java]");
 
         return this.insert(baseCurrency.getId(), targetCurrency.getId(), rate);
     }
