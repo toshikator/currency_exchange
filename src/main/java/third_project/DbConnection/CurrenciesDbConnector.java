@@ -101,7 +101,7 @@ public class CurrenciesDbConnector {
     }
 
     public ArrayList<Currency> getAllCurrencies() throws SQLException {
-        ArrayList<Currency> currencies = new ArrayList<Currency>();
+        ArrayList<Currency> currencies = new ArrayList<>();
         try (Connection conn = DBSource.get().getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + pr.getCurrenciesTableName());
              ResultSet resultSet = ps.executeQuery()

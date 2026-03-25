@@ -11,7 +11,6 @@ import third_project.service.Validation;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,19 +27,19 @@ public class ExchangeRatesServlet extends BaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
+            List<Currency> currenciesList = currenciesDbConnector.getAllCurrencies();
             List<DTOExchangeRate> exchangeRates = exchangeRatesDbConnector.selectAll().stream().map((exchangeRate) -> {
                 DTOExchangeRate result = new DTOExchangeRate();
                 result.setId(exchangeRate.getId());
 
-                try {
-                    result.setBaseCurrency(currenciesDbConnector.findById(exchangeRate.getBaseCurrencyId())
-                            .orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")));
+                result.setBaseCurrency(currenciesList.stream()
+                        .filter(currency -> currency.getId() == exchangeRate.getBaseCurrencyId())
+                        .findFirst().orElseThrow(() -> new IllegalStateException("Somehow base currency wasn't found")));
+                result.setTargetCurrency(currenciesList.stream()
+                        .filter(currency -> currency.getId() == exchangeRate.getTargetCurrencyId())
+                        .findFirst().orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")));
 
-                    result.setTargetCurrency(currenciesDbConnector.findById(exchangeRate.getTargetCurrencyId())
-                            .orElseThrow(() -> new IllegalStateException("Somehow target currency wasn't found")));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+
                 result.setRate(exchangeRate.getRate().setScale(2, RoundingMode.HALF_UP));
                 return result;
             }).collect(Collectors.toList());

@@ -71,7 +71,7 @@ public class ExchangeRatesDbConnector {
 
     public List<ExchangeRate> selectAll() throws SQLException {
 
-        ArrayList<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
+        ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
 
         try (Connection conn = DBSource.get().getConnection()) {
 
