@@ -31,7 +31,7 @@ public final class Validation {
 
 
     public static boolean areThreeStringsValid(String name, String code, String sign) {
-        return isStringValid(name) && isStringValid(code) && isStringValid(sign);
+        return isStringValid(name) && isStringValid(code) && isStringValid(sign) && code.length() == 3 && sign.length() == 3;
     }
 
     public static boolean isZeroOrNegative(BigDecimal var) {
@@ -57,6 +57,20 @@ public final class Validation {
         }
 
         String normalized = code.trim().toUpperCase();
+
+        if (!normalized.matches("[A-Z]{3}")) {
+            throw new IllegalArgumentException("Currency code must contain exactly 3 Latin letters");
+        }
+        return normalized;
+    }
+
+    public static String requireCurrencySign(String sign) {
+
+        if (isBlank(sign)) {
+            throw new IllegalArgumentException("Currency code is required");
+        }
+
+        String normalized = sign.trim().toUpperCase();
 
         if (!normalized.matches("[A-Z]{3}")) {
             throw new IllegalArgumentException("Currency code must contain exactly 3 Latin letters");
