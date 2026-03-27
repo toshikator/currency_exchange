@@ -18,6 +18,17 @@ public final class Validation {
         return str != null && !str.isBlank() && str.matches(regex);
     }
 
+    public static boolean isStringValidForCurrencySign(String str) {
+        String regex = "^(?!.*--)[A-Za-z0-9 !@#$%^&()_+=\\[\\]{}:,.?|-]{1,3}$";
+        return str != null && !str.isBlank() && str.matches(regex);
+    }
+
+    public static boolean isStringValidForCurrencyCode(String str) {
+        String regex = "[A-Za-z]{3}";
+        return str != null && !str.isBlank() && str.matches(regex);
+    }
+
+
     public static boolean isStringConvertableToBigDecimalRate(String str) {
         if (!isStringValid(str)) return false;
         try {

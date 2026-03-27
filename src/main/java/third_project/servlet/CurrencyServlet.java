@@ -23,7 +23,7 @@ public class CurrencyServlet extends BaseServlet {
 
         try {
             String pathInfo = request.getPathInfo();
-            if (!Validation.isStringValid(pathInfo)) {
+            if (!Validation.isStringValidForCurrencyCode(pathInfo.substring(1))) {
                 log.warning("CurrencyServlet: Invalid pathInfo: " + pathInfo + " [File: CurrencyServlet.java]");
                 writeError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid pathInfo");
                 return;
