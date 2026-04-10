@@ -8,13 +8,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 
 public class CurrenciesDbConnector {
 
     private static final Logger log = Logger.getLogger("com.example");
-    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
     private final PropertiesReader pr;
 
 

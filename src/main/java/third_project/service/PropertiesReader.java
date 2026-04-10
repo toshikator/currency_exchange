@@ -2,10 +2,9 @@ package third_project.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class PropertiesReader {
     private static final Logger log = Logger.getLogger("third_project.PropertiesReader");

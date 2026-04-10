@@ -1,9 +1,7 @@
 package third_project.servlet;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletResponse;
-import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
 
 import java.io.IOException;

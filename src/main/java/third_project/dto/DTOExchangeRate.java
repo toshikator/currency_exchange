@@ -1,10 +1,8 @@
 package third_project.dto;
 
-import third_project.DbConnection.CurrenciesDbConnector;
 import third_project.entities.Currency;
 
 import java.math.BigDecimal;
-import java.util.logging.Logger;
 
 public class DTOExchangeRate implements java.io.Serializable {
     private static final long serialVersionUID = 1L;

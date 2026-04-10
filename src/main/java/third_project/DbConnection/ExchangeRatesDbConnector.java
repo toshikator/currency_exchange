@@ -14,13 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 
 public class ExchangeRatesDbConnector {
 
     private static final Logger log = Logger.getLogger("com.example");
-    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[A-Za-z0-9_]+$");
     private final CurrenciesDbConnector currenciesDbConnector;
     PropertiesReader pr;
 
