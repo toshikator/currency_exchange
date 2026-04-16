@@ -1,8 +1,25 @@
 $(document).ready(function () {
-    
-    // const host = "http://bukhman.pro"
 
-    const host = window.location.origin;
+    // Compute API base from current origin + current path (without trailing slash)
+    const host = window.location.origin + window.location.pathname.replace(/\/$/, "");
+
+    function showApiError(jqXHR, fallbackMessage) {
+        let message = fallbackMessage || 'Request failed';
+        try {
+            if (jqXHR && jqXHR.responseText) {
+                const parsed = JSON.parse(jqXHR.responseText);
+                if (parsed && parsed.message) {
+                    message = parsed.message;
+                }
+            }
+        } catch (e) {
+            // ignore JSON parse error, keep fallback
+        }
+        const toast = $('#api-error-toast');
+        $(toast).find('.toast-body').text(message);
+        toast.toast('show');
+    }
+
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
         $.ajax({
@@ -53,11 +70,7 @@ $(document).ready(function () {
                 });
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+                showApiError(jqXHR, 'Failed to load currencies');
             }
         });
     }
@@ -75,11 +88,7 @@ $(document).ready(function () {
                 requestCurrencies();
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+                showApiError(jqXHR, 'Failed to add currency');
             }
         });
 
@@ -107,12 +116,8 @@ $(document).ready(function () {
                     tbody.append(row);
                 });
             },
-            error: function () {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+            error: function (jqXHR, textStatus, errorThrown) {
+                showApiError(jqXHR, 'Failed to load exchange rates');
             }
         });
     }
@@ -147,11 +152,7 @@ $(document).ready(function () {
                 row.find('td:eq(1)').text(exchangeRate);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+                showApiError(jqXHR, 'Failed to update exchange rate');
             }
         });
 
@@ -170,11 +171,7 @@ $(document).ready(function () {
                 requestExchangeRates();
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+                showApiError(jqXHR, 'Failed to add exchange rate');
             }
         });
 
@@ -191,16 +188,12 @@ $(document).ready(function () {
         $.ajax({
             url: `${host}/exchange?from=${baseCurrency}&to=${targetCurrency}&amount=${amount}`,
             type: "GET",
-            // data: "$("#add-exchange-rate").serialize()",
+            dataType: "json",
             success: function (data) {
                 $("#convert-converted-amount").val(data.convertedAmount);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                const error = JSON.parse(jqXHR.responseText);
-                const toast = $('#api-error-toast');
-
-                $(toast).find('.toast-body').text(error.message);
-                toast.toast("show");
+                showApiError(jqXHR, 'Failed to convert amount');
             }
         });
 
